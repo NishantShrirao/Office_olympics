@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧠 MIND GAMES - Team Challenge</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        :root{--bg:#0a0a0f;--card:#13131a;--card2:#1a1a24;--gold:#d4af37;--gold2:#f4cf67;--accent:#00d4aa;--accent2:#7c3aed;--text:#e4e4e7;--muted:#71717a;--success:#22c55e;--error:#ef4444;--gradient:linear-gradient(135deg,var(--gold),var(--gold2))}
+        body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+        body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:radial-gradient(ellipse at top,rgba(212,175,55,0.08),transparent 50%),radial-gradient(ellipse at bottom right,rgba(124,58,237,0.05),transparent 50%);pointer-events:none}
+        .container{max-width:800px;margin:0 auto;padding:20px;position:relative;z-index:1}
+        .header{text-align:center;padding:30px 0}
+        .header h1{font-family:'Space Grotesk',sans-serif;font-size:2.2rem;background:var(--gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:-1px;margin-bottom:5px}
+        .header p{color:var(--muted);font-size:0.95rem}
+        .score-bar{background:var(--card);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:16px 24px;margin-bottom:25px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:15px}
+        .team-info{display:flex;align-items:center;gap:12px}
+        .team-name{font-family:'Space Grotesk',sans-serif;color:var(--gold);font-size:1.1rem;font-weight:600}
+        .score-display{font-family:'Space Grotesk',sans-serif;font-size:1.4rem;color:var(--accent)}
+        .round-pill{background:rgba(212,175,55,0.1);border:1px solid rgba(212,175,55,0.2);padding:8px 18px;border-radius:50px;font-size:0.85rem;color:var(--gold)}
+        .screen{display:none}
+        .screen.active{display:block;animation:fadeUp .5s ease}
+        @keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+        .welcome{text-align:center;padding:40px 20px}
+        .logo{font-size:4rem;margin-bottom:20px;display:block}
+        .tagline{font-size:1.8rem;font-family:'Space Grotesk',sans-serif;color:var(--text);margin-bottom:10px}
+        .tagline span{background:var(--gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+        .game-modes{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin:35px 0}
+        .mode{background:var(--card);border:1px solid rgba(255,255,255,0.05);border-radius:16px;padding:25px 15px;text-align:center;transition:all .3s}
+        .mode:hover{border-color:rgba(212,175,55,0.3);transform:translateY(-3px)}
+        .mode-icon{font-size:2rem;margin-bottom:12px;display:block}
+        .mode h4{font-family:'Space Grotesk',sans-serif;color:var(--gold);font-size:0.95rem;margin-bottom:6px}
+        .mode p{font-size:0.75rem;color:var(--muted);line-height:1.5}
+        .input-group{margin:30px 0}
+        .input-group label{display:block;margin-bottom:10px;color:var(--muted);font-size:0.9rem}
+        .input-group input{background:var(--card2);border:1px solid rgba(255,255,255,0.1);color:var(--text);padding:16px 24px;font-size:1rem;border-radius:12px;width:100%;max-width:320px;text-align:center;transition:all .3s}
+        .input-group input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,175,55,0.1)}
+        .btn{font-family:'Space Grotesk',sans-serif;font-size:1rem;padding:16px 40px;border:none;border-radius:12px;cursor:pointer;transition:all .3s;font-weight:600;letter-spacing:0.5px}
+        .btn-primary{background:var(--gradient);color:#000;box-shadow:0 4px 20px rgba(212,175,55,0.3)}
+        .btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 25px rgba(212,175,55,0.4)}
+        .btn-secondary{background:transparent;border:1px solid rgba(255,255,255,0.2);color:var(--text)}
+        .btn-secondary:hover{border-color:var(--gold);color:var(--gold)}
+        .game-card{background:var(--card);border:1px solid rgba(255,255,255,0.05);border-radius:20px;padding:35px;margin-bottom:20px;position:relative}
+        .game-type{position:absolute;top:20px;left:25px;font-size:0.75rem;text-transform:uppercase;letter-spacing:2px;color:var(--muted)}
+        .round-num{position:absolute;top:20px;right:25px;font-family:'Space Grotesk',sans-serif;color:var(--gold);font-size:0.9rem}
+        .question-area{margin:50px 0 30px;text-align:center}
+        .question-text{font-size:1.4rem;line-height:1.7;color:var(--text);max-width:600px;margin:0 auto}
+        .question-text.large{font-size:1.6rem}
+        .stat-display{background:var(--card2);border-radius:16px;padding:30px;margin:25px auto;max-width:400px;text-align:center}
+        .stat-label{color:var(--muted);font-size:0.85rem;margin-bottom:8px}
+        .stat-value{font-family:'Space Grotesk',sans-serif;font-size:2.5rem;color:var(--gold)}
+        .stat-unit{color:var(--muted);font-size:1rem;margin-left:5px}
+        .vs-text{font-family:'Space Grotesk',sans-serif;font-size:1.2rem;color:var(--muted);margin:20px 0}
+        .compare-item{background:var(--card2);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:20px;margin:10px 0;text-align:center;font-size:1.1rem}
+        .options{display:grid;gap:12px;max-width:500px;margin:30px auto}
+        .option{background:var(--card2);border:2px solid rgba(255,255,255,0.08);color:var(--text);padding:18px 24px;border-radius:14px;font-size:1rem;cursor:pointer;transition:all .3s;text-align:left;display:flex;align-items:center;gap:15px}
+        .option:hover{border-color:rgba(212,175,55,0.4);background:rgba(212,175,55,0.05)}
+        .option.selected{border-color:var(--gold);background:rgba(212,175,55,0.1)}
+        .option.correct{border-color:var(--success);background:rgba(34,197,94,0.15)}
+        .option.wrong{border-color:var(--error);background:rgba(239,68,68,0.15)}
+        .option-letter{width:36px;height:36px;background:rgba(255,255,255,0.05);border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:0.9rem;flex-shrink:0}
+        .option.selected .option-letter{background:var(--gold);color:#000}
+        .option.correct .option-letter{background:var(--success);color:#fff}
+        .option.wrong .option-letter{background:var(--error);color:#fff}
+        .hl-buttons{display:flex;justify-content:center;gap:20px;margin:30px 0}
+        .hl-btn{padding:20px 50px;border-radius:14px;font-family:'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:600;cursor:pointer;transition:all .3s;border:2px solid transparent}
+        .hl-btn.higher{background:rgba(34,197,94,0.1);border-color:var(--success);color:var(--success)}
+        .hl-btn.higher:hover{background:var(--success);color:#fff}
+        .hl-btn.lower{background:rgba(239,68,68,0.1);border-color:var(--error);color:var(--error)}
+        .hl-btn.lower:hover{background:var(--error);color:#fff}
+        .hl-btn.selected{transform:scale(1.05)}
+        .hl-btn.correct{background:var(--success)!important;color:#fff!important;border-color:var(--success)!important}
+        .hl-btn.wrong{background:var(--error)!important;color:#fff!important;border-color:var(--error)!important}
+        .wyr-options{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:30px 0}
+        .wyr-option{background:var(--card2);border:2px solid rgba(255,255,255,0.08);border-radius:16px;padding:30px 20px;text-align:center;cursor:pointer;transition:all .3s;min-height:150px;display:flex;flex-direction:column;justify-content:center}
+        .wyr-option:hover{border-color:rgba(212,175,55,0.4)}
+        .wyr-option.selected{border-color:var(--gold);background:rgba(212,175,55,0.1)}
+        .wyr-option h4{font-family:'Space Grotesk',sans-serif;color:var(--gold);font-size:0.85rem;margin-bottom:10px}
+        .wyr-option p{font-size:0.95rem;line-height:1.5;color:var(--text)}
+        .wyr-result{margin-top:15px;font-family:'Space Grotesk',sans-serif;font-size:1.1rem}
+        .feedback{padding:16px 24px;border-radius:12px;margin:20px 0;text-align:center;font-size:1rem;font-weight:600;display:none}
+        .feedback.show{display:block;animation:pop .4s ease}
+        .feedback.success{background:rgba(34,197,94,0.15);border:1px solid var(--success);color:var(--success)}
+        .feedback.error{background:rgba(239,68,68,0.15);border:1px solid var(--error);color:var(--error)}
+        .feedback.info{background:rgba(212,175,55,0.15);border:1px solid var(--gold);color:var(--gold)}
+        @keyframes pop{from{opacity:0;transform:scale(0.9)}to{opacity:1;transform:scale(1)}}
+        .answer-reveal{background:var(--card2);border-radius:12px;padding:20px;margin:20px 0;text-align:center;display:none}
+        .answer-reveal.show{display:block}
+        .answer-reveal .label{color:var(--muted);font-size:0.8rem;margin-bottom:5px}
+        .answer-reveal .value{font-family:'Space Grotesk',sans-serif;font-size:1.8rem;color:var(--accent)}
+        .btn-row{text-align:center;margin-top:25px}
+        .leaderboard{background:var(--card);border:1px solid rgba(255,255,255,0.05);border-radius:16px;padding:25px;margin-top:30px}
+        .leaderboard h3{font-family:'Space Grotesk',sans-serif;color:var(--gold);text-align:center;font-size:1.1rem;margin-bottom:20px;letter-spacing:1px}
+        .lb-table{width:100%;border-collapse:collapse}
+        .lb-table th,.lb-table td{padding:12px;text-align:center;font-size:0.9rem}
+        .lb-table th{color:var(--muted);font-weight:400;border-bottom:1px solid rgba(255,255,255,0.05)}
+        .lb-table td{border-bottom:1px solid rgba(255,255,255,0.03)}
+        .rank-1 td{color:var(--gold)!important}
+        .rank-2 td{color:#c0c0c0!important}
+        .rank-3 td{color:#cd7f32!important}
+        .victory{text-align:center;padding:50px 20px}
+        .victory-icon{font-size:5rem;margin-bottom:20px;display:block}
+        .victory h2{font-family:'Space Grotesk',sans-serif;font-size:2rem;background:var(--gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:10px}
+        .final-score{font-family:'Space Grotesk',sans-serif;font-size:4rem;color:var(--gold);margin:30px 0}
+        .final-score span{font-size:1.5rem;color:var(--muted)}
+        .stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;max-width:450px;margin:30px auto}
+        .stat-box{background:var(--card);border:1px solid rgba(255,255,255,0.05);border-radius:12px;padding:20px}
+        .stat-box .num{font-family:'Space Grotesk',sans-serif;font-size:1.8rem;color:var(--accent)}
+        .stat-box .lbl{color:var(--muted);font-size:0.8rem;margin-top:5px}
+        @media(max-width:768px){.game-modes{grid-template-columns:1fr}.wyr-options{grid-template-columns:1fr}.hl-buttons{flex-direction:column;align-items:center}.stats-grid{grid-template-columns:1fr}}
+        .confetti{position:fixed;width:8px;height:8px;top:-10px;pointer-events:none;animation:confettiFall 4s linear forwards}
+        @keyframes confettiFall{to{transform:translateY(105vh) rotate(720deg);opacity:0}}
+    </style>
+</head>
+<body>
+<div class="container">
+    <header class="header">
+        <h1>MIND GAMES</h1>
+        <p>Think Fast. Think Smart. Win Big.</p>
+    </header>
+    
+    <div class="score-bar" id="score-bar" style="display:none">
+        <div class="team-info">
+            <span class="team-name" id="team-display">Team</span>
+        </div>
+        <div class="score-display">Score: <span id="score">0</span></div>
+        <div class="round-pill">Round <span id="round-num">1</span>/15</div>
+    </div>
+
+    <!-- WELCOME -->
+    <div class="screen active" id="welcome">
+        <div class="welcome">
+            <span class="logo">🧠</span>
+            <h2 class="tagline">3 Games. <span>15 Rounds.</span> 1 Winner.</h2>
+            <div class="game-modes">
+                <div class="mode">
+                    <span class="mode-icon">💡</span>
+                    <h4>LATERAL THINKING</h4>
+                    <p>Clever riddles that make you go "Aha!"</p>
+                </div>
+                <div class="mode">
+                    <span class="mode-icon">📊</span>
+                    <h4>HIGHER OR LOWER</h4>
+                    <p>Guess the stats. Trust your instincts.</p>
+                </div>
+                <div class="mode">
+                    <span class="mode-icon">⚖️</span>
+                    <h4>WOULD YOU RATHER</h4>
+                    <p>Impossible choices. No right answer.</p>
+                </div>
+            </div>
+            <div class="input-group">
+                <label>Enter your team name</label>
+                <input type="text" id="teamName" placeholder="e.g., Big Brains" maxlength="25">
+            </div>
+            <button class="btn btn-primary" onclick="startGame()">Start Challenge</button>
+            <div class="leaderboard" id="welcome-lb">
+                <h3>🏆 LEADERBOARD</h3>
+                <table class="lb-table"><thead><tr><th>Rank</th><th>Team</th><th>Score</th></tr></thead><tbody id="lb-body"><tr><td colspan="3" style="color:var(--muted);padding:25px">No teams yet</td></tr></tbody></table>
+            </div>
+        </div>
+    </div>
+
+    <!-- GAME -->
+    <div class="screen" id="game">
+        <div class="game-card" id="game-card">
+            <span class="game-type" id="game-type">LATERAL THINKING</span>
+            <span class="round-num" id="round-display">01/15</span>
+            <div class="question-area" id="question-area"></div>
+            <div class="feedback" id="feedback"></div>
+            <div class="answer-reveal" id="answer-reveal"></div>
+            <div class="btn-row" id="btn-row"></div>
+        </div>
+    </div>
+
+    <!-- VICTORY -->
+    <div class="screen" id="victory">
+        <div class="victory">
+            <span class="victory-icon">🏆</span>
+            <h2>Challenge Complete!</h2>
+            <p style="color:var(--muted)"><span id="winner"></span></p>
+            <div class="final-score"><span id="final-score">0</span> <span>pts</span></div>
+            <div class="stats-grid">
+                <div class="stat-box"><div class="num" id="v-correct">0</div><div class="lbl">Correct</div></div>
+                <div class="stat-box"><div class="num" id="v-streak">0</div><div class="lbl">Best Streak</div></div>
+                <div class="stat-box"><div class="num" id="v-time">0:00</div><div class="lbl">Time</div></div>
+            </div>
+            <div style="margin-top:30px">
+                <button class="btn btn-primary" onclick="playAgain()">Play Again</button>
+                <button class="btn btn-secondary" onclick="showFinalLB()" style="margin-left:10px">Leaderboard</button>
+            </div>
+            <div class="leaderboard" id="final-lb" style="display:none;margin-top:30px">
+                <h3>🏆 TOP SCORES</h3>
+                <table class="lb-table"><thead><tr><th>Rank</th><th>Team</th><th>Score</th></tr></thead><tbody id="final-lb-body"></tbody></table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const ROUNDS = [
+    // LATERAL THINKING (1-5)
+    {
+        type: 'lateral',
+        question: 'A man pushes his car to a hotel and loses all his money. What happened?',
+        options: ['He crashed the car', 'He was playing Monopoly', 'The hotel was a casino', 'He sold the car'],
+        answer: 1,
+        explanation: 'He was playing Monopoly! 🎲',
+        points: 100
+    },
+    {
+        type: 'lateral',
+        question: 'What can travel around the world while staying in a corner?',
+        options: ['A satellite', 'A postage stamp', 'The internet', 'A compass'],
+        answer: 1,
+        explanation: 'A postage stamp stays in the corner of an envelope! 📮',
+        points: 100
+    },
+    {
+        type: 'lateral',
+        question: 'I have cities, but no houses. I have mountains, but no trees. I have water, but no fish. What am I?',
+        options: ['A painting', 'A map', 'A dream', 'A photograph'],
+        answer: 1,
+        explanation: 'A map has all these without the real things! 🗺️',
+        points: 100
+    },
+    {
+        type: 'lateral',
+        question: 'A woman shoots her husband, then holds him underwater for 5 minutes. Next, she hangs him. Right after, they enjoy a lovely dinner. How?',
+        options: ['It was a dream', 'She photographed him', 'He\'s a ghost', 'It\'s a movie scene'],
+        answer: 1,
+        explanation: 'She shot a photo, developed it in water, and hung it to dry! 📸',
+        points: 100
+    },
+    {
+        type: 'lateral',
+        question: 'What gets wetter the more it dries?',
+        options: ['A sponge', 'A towel', 'Ice', 'Your hands'],
+        answer: 1,
+        explanation: 'A towel gets wetter as it dries you off! 🛁',
+        points: 100
+    },
+    
+    // HIGHER OR LOWER (6-10)
+    {
+        type: 'higher-lower',
+        item1: { name: 'Average emails sent per day globally', value: 333 },
+        item2: { name: 'Flights in the air right now', value: 9700 },
+        unit1: 'billion',
+        unit2: 'flights',
+        points: 150
+    },
+    {
+        type: 'higher-lower',
+        item1: { name: 'Google searches per second', value: 99000 },
+        item2: { name: 'Tweets posted per second', value: 6000 },
+        unit1: 'searches',
+        unit2: 'tweets',
+        points: 150
+    },
+    {
+        type: 'higher-lower',
+        item1: { name: 'Years to pay off US national debt ($1/sec)', value: 1000000 },
+        item2: { name: 'Age of the universe in years', value: 13800000000 },
+        unit1: 'years',
+        unit2: 'years',
+        points: 150
+    },
+    {
+        type: 'higher-lower',
+        item1: { name: 'Netflix subscribers worldwide', value: 238 },
+        item2: { name: 'Spotify premium subscribers', value: 220 },
+        unit1: 'million',
+        unit2: 'million',
+        points: 150
+    },
+    {
+        type: 'higher-lower',
+        item1: { name: 'Hours of video uploaded to YouTube per minute', value: 500 },
+        item2: { name: 'Wikipedia articles', value: 6700000 },
+        unit1: 'hours',
+        unit2: 'articles',
+        points: 150
+    },
+    
+    // WOULD YOU RATHER (11-15)
+    {
+        type: 'wyr',
+        optionA: 'Accidentally reply-all with an embarrassing personal message to 500 colleagues',
+        optionB: 'Have your complete browser history displayed on the office big screen for 1 hour',
+        points: 50
+    },
+    {
+        type: 'wyr',
+        optionA: 'Have your boss hear every thought you think during meetings',
+        optionB: 'Say everything you think out loud for one full workday',
+        points: 50
+    },
+    {
+        type: 'wyr',
+        optionA: 'Never be able to use copy-paste again',
+        optionB: 'Have your typing speed permanently limited to 10 words per minute',
+        points: 50
+    },
+    {
+        type: 'wyr',
+        optionA: 'Attend an 8-hour meeting every Monday with no breaks',
+        optionB: 'Work every weekend but have Wednesdays completely off',
+        points: 50
+    },
+    {
+        type: 'wyr',
+        optionA: 'Have unlimited PTO but earn 50% less salary',
+        optionB: 'Earn double salary but never take a vacation again',
+        points: 50
+    }
+];
+
+let G = {
+    team: '',
+    round: 0,
+    score: 0,
+    correct: 0,
+    streak: 0,
+    bestStreak: 0,
+    startTime: null,
+    selected: null,
+    answered: false
+};
+
+function loadLB() {
+    const l = JSON.parse(localStorage.getItem('mindGamesV1') || '[]');
+    updateLB(l, 'lb-body');
+}
+
+function updateLB(l, id) {
+    const t = document.getElementById(id);
+    if (!l.length) {
+        t.innerHTML = '<tr><td colspan="3" style="color:var(--muted);padding:25px">No teams yet</td></tr>';
+        return;
+    }
+    l.sort((a, b) => b.score - a.score);
+    t.innerHTML = l.slice(0, 8).map((e, i) => `
+        <tr class="${i < 3 ? 'rank-' + (i + 1) : ''}">
+            <td>${['🥇', '🥈', '🥉'][i] || (i + 1)}</td>
+            <td>${e.name}</td>
+            <td>${e.score}</td>
+        </tr>
+    `).join('');
+}
+
+function startGame() {
+    const name = document.getElementById('teamName').value.trim();
+    if (!name) {
+        document.getElementById('teamName').style.borderColor = 'var(--error)';
+        document.getElementById('teamName').placeholder = 'Please enter a name';
+        return;
+    }
+    
+    G = { team: name, round: 0, score: 0, correct: 0, streak: 0, bestStreak: 0, startTime: Date.now(), selected: null, answered: false };
+    
+    document.getElementById('score-bar').style.display = 'flex';
+    document.getElementById('team-display').textContent = name;
+    document.getElementById('score').textContent = '0';
+    
+    loadRound();
+}
+
+function loadRound() {
+    if (G.round >= ROUNDS.length) {
+        endGame();
+        return;
+    }
+    
+    const r = ROUNDS[G.round];
+    G.selected = null;
+    G.answered = false;
+    
+    document.getElementById('round-num').textContent = G.round + 1;
+    document.getElementById('round-display').textContent = `${String(G.round + 1).padStart(2, '0')}/${ROUNDS.length}`;
+    document.getElementById('feedback').className = 'feedback';
+    document.getElementById('answer-reveal').className = 'answer-reveal';
+    
+    const typeLabels = { 'lateral': '💡 LATERAL THINKING', 'higher-lower': '📊 HIGHER OR LOWER', 'wyr': '⚖️ WOULD YOU RATHER' };
+    document.getElementById('game-type').textContent = typeLabels[r.type];
+    
+    const qa = document.getElementById('question-area');
+    const br = document.getElementById('btn-row');
+    
+    if (r.type === 'lateral') {
+        qa.innerHTML = `
+            <p class="question-text">${r.question}</p>
+            <div class="options" id="options">
+                ${r.options.map((o, i) => `
+                    <div class="option" onclick="selectOption(${i})" data-idx="${i}">
+                        <span class="option-letter">${['A', 'B', 'C', 'D'][i]}</span>
+                        <span>${o}</span>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+        br.innerHTML = `<button class="btn btn-primary" onclick="submitLateral()">Submit Answer</button>`;
+    }
+    else if (r.type === 'higher-lower') {
+        qa.innerHTML = `
+            <div class="stat-display">
+                <div class="stat-label">${r.item1.name}</div>
+                <div class="stat-value">${r.item1.value.toLocaleString()} <span class="stat-unit">${r.unit1}</span></div>
+            </div>
+            <p class="vs-text">Is this <strong>HIGHER</strong> or <strong>LOWER</strong> than...</p>
+            <div class="compare-item">${r.item2.name}</div>
+            <div class="hl-buttons" id="hl-buttons">
+                <button class="hl-btn higher" onclick="selectHL('higher')">↑ HIGHER</button>
+                <button class="hl-btn lower" onclick="selectHL('lower')">↓ LOWER</button>
+            </div>
+        `;
+        br.innerHTML = `<button class="btn btn-primary" onclick="submitHL()">Lock Answer</button>`;
+    }
+    else if (r.type === 'wyr') {
+        qa.innerHTML = `
+            <p class="question-text large">Would you rather...</p>
+            <div class="wyr-options">
+                <div class="wyr-option" onclick="selectWYR('A')" data-opt="A">
+                    <h4>OPTION A</h4>
+                    <p>${r.optionA}</p>
+                </div>
+                <div class="wyr-option" onclick="selectWYR('B')" data-opt="B">
+                    <h4>OPTION B</h4>
+                    <p>${r.optionB}</p>
+                </div>
+            </div>
+        `;
+        br.innerHTML = `<button class="btn btn-primary" onclick="submitWYR()">Lock Choice</button>`;
+    }
+    
+    show('game');
+}
+
+function selectOption(idx) {
+    if (G.answered) return;
+    document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+    document.querySelector(`.option[data-idx="${idx}"]`).classList.add('selected');
+    G.selected = idx;
+}
+
+function selectHL(choice) {
+    if (G.answered) return;
+    document.querySelectorAll('.hl-btn').forEach(b => b.classList.remove('selected'));
+    document.querySelector(`.hl-btn.${choice}`).classList.add('selected');
+    G.selected = choice;
+}
+
+function selectWYR(opt) {
+    if (G.answered) return;
+    document.querySelectorAll('.wyr-option').forEach(o => o.classList.remove('selected'));
+    document.querySelector(`.wyr-option[data-opt="${opt}"]`).classList.add('selected');
+    G.selected = opt;
+}
+
+function submitLateral() {
+    if (G.answered) { nextRound(); return; }
+    if (G.selected === null) {
+        showFeedback('error', 'Please select an answer');
+        return;
+    }
+    
+    G.answered = true;
+    const r = ROUNDS[G.round];
+    const isCorrect = G.selected === r.answer;
+    
+    document.querySelectorAll('.option').forEach((o, i) => {
+        o.style.pointerEvents = 'none';
+        if (i === r.answer) o.classList.add('correct');
+        else if (i === G.selected) o.classList.add('wrong');
+    });
+    
+    if (isCorrect) {
+        G.score += r.points;
+        G.correct++;
+        G.streak++;
+        if (G.streak > G.bestStreak) G.bestStreak = G.streak;
+        document.getElementById('score').textContent = G.score;
+        showFeedback('success', `+${r.points} points!`);
+    } else {
+        G.streak = 0;
+        showFeedback('error', 'Not quite right');
+    }
+    
+    document.getElementById('answer-reveal').innerHTML = `<div class="label">Answer</div><div class="value">${r.explanation}</div>`;
+    document.getElementById('answer-reveal').classList.add('show');
+    document.getElementById('btn-row').innerHTML = `<button class="btn btn-primary" onclick="nextRound()">Next Round →</button>`;
+}
+
+function submitHL() {
+    if (G.answered) { nextRound(); return; }
+    if (G.selected === null) {
+        showFeedback('error', 'Make your choice');
+        return;
+    }
+    
+    G.answered = true;
+    const r = ROUNDS[G.round];
+    const correctAnswer = r.item1.value > r.item2.value ? 'higher' : 'lower';
+    const isCorrect = G.selected === correctAnswer;
+    
+    document.querySelectorAll('.hl-btn').forEach(b => {
+        b.style.pointerEvents = 'none';
+        if (b.classList.contains(correctAnswer)) b.classList.add('correct');
+        else if (b.classList.contains(G.selected)) b.classList.add('wrong');
+    });
+    
+    if (isCorrect) {
+        G.score += r.points;
+        G.correct++;
+        G.streak++;
+        if (G.streak > G.bestStreak) G.bestStreak = G.streak;
+        document.getElementById('score').textContent = G.score;
+        showFeedback('success', `+${r.points} points!`);
+    } else {
+        G.streak = 0;
+        showFeedback('error', 'Wrong guess!');
+    }
+    
+    document.getElementById('answer-reveal').innerHTML = `<div class="label">${r.item2.name}</div><div class="value">${r.item2.value.toLocaleString()} ${r.unit2}</div>`;
+    document.getElementById('answer-reveal').classList.add('show');
+    document.getElementById('btn-row').innerHTML = `<button class="btn btn-primary" onclick="nextRound()">Next Round →</button>`;
+}
+
+function submitWYR() {
+    if (G.answered) { nextRound(); return; }
+    if (G.selected === null) {
+        showFeedback('error', 'Make your choice');
+        return;
+    }
+    
+    G.answered = true;
+    const r = ROUNDS[G.round];
+    
+    // WYR has no wrong answer - everyone gets points
+    G.score += r.points;
+    G.correct++;
+    document.getElementById('score').textContent = G.score;
+    
+    showFeedback('info', `+${r.points} points! Bold choice 😏`);
+    document.getElementById('btn-row').innerHTML = `<button class="btn btn-primary" onclick="nextRound()">Next Round →</button>`;
+}
+
+function nextRound() {
+    G.round++;
+    loadRound();
+}
+
+function showFeedback(type, msg) {
+    const fb = document.getElementById('feedback');
+    fb.className = `feedback show ${type}`;
+    fb.textContent = msg;
+}
+
+function endGame() {
+    const elapsed = Math.floor((Date.now() - G.startTime) / 1000);
+    const timeStr = `${Math.floor(elapsed / 60)}:${String(elapsed % 60).padStart(2, '0')}`;
+    
+    // Save
+    const scores = JSON.parse(localStorage.getItem('mindGamesV1') || '[]');
+    scores.push({ name: G.team, score: G.score, time: timeStr, ts: Date.now() });
+    localStorage.setItem('mindGamesV1', JSON.stringify(scores));
+    
+    document.getElementById('score-bar').style.display = 'none';
+    document.getElementById('winner').textContent = G.team;
+    document.getElementById('final-score').textContent = G.score;
+    document.getElementById('v-correct').textContent = G.correct + '/' + ROUNDS.length;
+    document.getElementById('v-streak').textContent = G.bestStreak;
+    document.getElementById('v-time').textContent = timeStr;
+    
+    show('victory');
+    confetti();
+}
+
+function show(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+}
+
+function confetti() {
+    const colors = ['#d4af37', '#f4cf67', '#00d4aa', '#7c3aed', '#22c55e'];
+    for (let i = 0; i < 60; i++) {
+        setTimeout(() => {
+            const c = document.createElement('div');
+            c.className = 'confetti';
+            c.style.left = Math.random() * 100 + 'vw';
+            c.style.background = colors[Math.floor(Math.random() * colors.length)];
+            c.style.animationDuration = (Math.random() * 2 + 2) + 's';
+            document.body.appendChild(c);
+            setTimeout(() => c.remove(), 4000);
+        }, i * 40);
+    }
+}
+
+function showFinalLB() {
+    const l = JSON.parse(localStorage.getItem('mindGamesV1') || '[]');
+    updateLB(l, 'final-lb-body');
+    document.getElementById('final-lb').style.display = 'block';
+}
+
+function playAgain() {
+    document.getElementById('teamName').value = '';
+    document.getElementById('teamName').style.borderColor = '';
+    document.getElementById('final-lb').style.display = 'none';
+    show('welcome');
+    loadLB();
+}
+
+window.onload = loadLB;
+</script>
+</body>
+</html>
+

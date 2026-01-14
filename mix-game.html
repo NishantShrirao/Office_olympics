@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎮 BRAIN BATTLE - Team Challenge!</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        :root{--primary:#6C5CE7;--secondary:#00CEC9;--accent:#FD79A8;--success:#00B894;--error:#D63031;--warning:#FDCB6E;--dark:#2D3436;--card:#353b48;--gradient:linear-gradient(135deg,#6C5CE7,#a29bfe)}
+        body{font-family:'Nunito',sans-serif;background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460);color:#fff;min-height:100vh}
+        .container{max-width:900px;margin:0 auto;padding:15px}
+        .header{text-align:center;padding:20px 0}
+        .header h1{font-family:'Fredoka One',cursive;font-size:2.5rem;background:var(--gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:2px}
+        .header .sub{color:var(--secondary);font-size:1rem;margin-top:5px}
+        .timer{position:fixed;top:15px;right:15px;background:var(--gradient);border-radius:15px;padding:12px 24px;font-family:'Fredoka One',cursive;font-size:1.5rem;z-index:1000;box-shadow:0 5px 20px rgba(108,92,231,0.4)}
+        .timer.warn{animation:pulse .5s infinite;background:linear-gradient(135deg,#D63031,#e17055)}
+        @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+        .score-bar{background:var(--card);border-radius:15px;padding:15px 20px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;border:2px solid rgba(255,255,255,0.1)}
+        .team-info{display:flex;align-items:center;gap:10px}
+        .team-name{font-family:'Fredoka One',cursive;color:var(--warning);font-size:1.2rem}
+        .score{font-family:'Fredoka One',cursive;font-size:1.3rem;color:var(--success)}
+        .round-info{background:rgba(108,92,231,0.2);padding:8px 16px;border-radius:20px;font-size:0.9rem}
+        .screen{display:none}
+        .screen.active{display:block;animation:fadeIn .4s ease}
+        @keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+        .welcome{text-align:center;padding:30px 10px}
+        .mascot{font-size:4rem;display:block;margin-bottom:15px;animation:bounce 2s infinite}
+        @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-15px)}}
+        .game-types{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin:25px 0}
+        .game-type{background:var(--card);border-radius:15px;padding:20px;text-align:center;border:2px solid rgba(255,255,255,0.1)}
+        .game-type .icon{font-size:2.5rem;margin-bottom:10px}
+        .game-type h4{font-family:'Fredoka One',cursive;color:var(--secondary);margin-bottom:5px}
+        .game-type p{font-size:0.8rem;color:#aaa}
+        .input-section{margin:25px 0}
+        .input-section label{display:block;margin-bottom:10px;font-size:1rem;color:#ccc}
+        .input-section input{background:rgba(255,255,255,0.08);border:2px solid var(--primary);color:#fff;padding:14px 24px;font-size:1.1rem;border-radius:50px;width:100%;max-width:320px;text-align:center}
+        .input-section input:focus{outline:none;border-color:var(--secondary);box-shadow:0 0 20px rgba(0,206,201,0.3)}
+        .btn{font-family:'Fredoka One',cursive;font-size:1.1rem;padding:14px 36px;border:none;border-radius:50px;cursor:pointer;transition:all .3s;letter-spacing:1px}
+        .btn-primary{background:var(--gradient);color:#fff;box-shadow:0 5px 20px rgba(108,92,231,0.4)}
+        .btn-primary:hover{transform:translateY(-3px);box-shadow:0 8px 25px rgba(108,92,231,0.5)}
+        .btn-secondary{background:transparent;border:2px solid var(--secondary);color:var(--secondary)}
+        .game-card{background:var(--card);border-radius:20px;padding:30px;margin-bottom:20px;border:2px solid rgba(255,255,255,0.1);position:relative;overflow:hidden}
+        .game-card::before{content:'';position:absolute;top:0;left:0;right:0;height:5px;background:var(--gradient)}
+        .round-badge{position:absolute;top:15px;right:15px;background:var(--gradient);padding:8px 16px;border-radius:20px;font-family:'Fredoka One',cursive;font-size:0.9rem}
+        .category-badge{display:inline-block;background:rgba(0,206,201,0.2);color:var(--secondary);padding:6px 14px;border-radius:15px;font-size:0.85rem;margin-bottom:15px}
+        .puzzle-area{background:rgba(0,0,0,0.3);border-radius:15px;padding:30px;margin:20px 0;text-align:center;min-height:150px;display:flex;align-items:center;justify-content:center}
+        .emoji-puzzle{font-size:3.5rem;letter-spacing:10px;line-height:1.5}
+        .image-puzzle{position:relative;display:inline-block}
+        .image-puzzle img{max-width:300px;max-height:250px;border-radius:10px;transition:filter .5s}
+        .image-puzzle.blur-5{filter:blur(20px)}
+        .image-puzzle.blur-4{filter:blur(15px)}
+        .image-puzzle.blur-3{filter:blur(10px)}
+        .image-puzzle.blur-2{filter:blur(5px)}
+        .image-puzzle.blur-1{filter:blur(2px)}
+        .image-puzzle.blur-0{filter:blur(0)}
+        .pattern-puzzle{font-size:2.5rem;letter-spacing:15px}
+        .choices{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;max-width:500px;margin:20px auto}
+        .choice{background:rgba(255,255,255,0.06);border:2px solid rgba(255,255,255,0.15);color:#fff;padding:16px;border-radius:15px;font-size:1rem;cursor:pointer;transition:all .3s;text-align:center;font-weight:600}
+        .choice:hover{background:rgba(108,92,231,0.2);border-color:var(--primary);transform:scale(1.02)}
+        .choice.selected{background:var(--primary);border-color:var(--primary)}
+        .choice.correct{background:var(--success);border-color:var(--success)}
+        .choice.wrong{background:var(--error);border-color:var(--error)}
+        .answer-input{background:rgba(0,0,0,0.3);border:2px solid var(--primary);color:#fff;padding:14px 24px;font-size:1.1rem;border-radius:50px;width:100%;max-width:300px;text-align:center}
+        .feedback{padding:15px 25px;border-radius:12px;margin:15px 0;text-align:center;font-size:1rem;font-weight:700;display:none}
+        .feedback.show{display:block;animation:pop .4s ease}
+        .feedback.success{background:linear-gradient(135deg,var(--success),#55efc4)}
+        .feedback.error{background:linear-gradient(135deg,var(--error),#ff7675)}
+        @keyframes pop{0%{transform:scale(0.8);opacity:0}50%{transform:scale(1.05)}100%{transform:scale(1);opacity:1}}
+        .points-popup{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'Fredoka One',cursive;font-size:4rem;color:var(--success);text-shadow:0 0 30px rgba(0,184,148,0.8);z-index:2000;animation:pointsPop 1s ease forwards;pointer-events:none}
+        @keyframes pointsPop{0%{opacity:0;transform:translate(-50%,-50%) scale(0.5)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.2)}100%{opacity:0;transform:translate(-50%,-80%) scale(1)}}
+        .reveal-btn{background:rgba(253,203,110,0.2);color:var(--warning);border:2px solid var(--warning);padding:10px 20px;border-radius:25px;cursor:pointer;font-size:0.9rem;margin-top:10px}
+        .reveal-btn:hover{background:var(--warning);color:#000}
+        .leaderboard{background:var(--card);border-radius:15px;padding:20px;margin-top:25px;border:2px solid var(--warning)}
+        .leaderboard h3{font-family:'Fredoka One',cursive;color:var(--warning);text-align:center;font-size:1.4rem;margin-bottom:15px}
+        .lb-table{width:100%;border-collapse:collapse;font-size:0.9rem}
+        .lb-table th,.lb-table td{padding:12px 8px;text-align:center}
+        .lb-table th{color:var(--secondary);font-family:'Fredoka One',cursive;border-bottom:1px solid rgba(255,255,255,0.1)}
+        .rank-1{color:gold!important;font-weight:700}
+        .rank-2{color:silver!important}
+        .rank-3{color:#cd7f32!important}
+        .victory{text-align:center;padding:40px 15px}
+        .trophy{font-size:6rem;display:block;margin-bottom:15px;animation:spin 2s infinite}
+        @keyframes spin{0%,100%{transform:rotate(-5deg) scale(1)}50%{transform:rotate(5deg) scale(1.1)}}
+        .victory h2{font-family:'Fredoka One',cursive;font-size:2.5rem;background:var(--gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:10px}
+        .final-score{font-family:'Fredoka One',cursive;font-size:4rem;color:var(--warning);margin:20px 0}
+        .stats{display:flex;justify-content:center;gap:20px;margin:25px 0;flex-wrap:wrap}
+        .stat{background:var(--card);border-radius:15px;padding:20px 30px;border:2px solid var(--primary)}
+        .stat .val{font-family:'Fredoka One',cursive;font-size:2rem;color:var(--secondary)}
+        .stat .lbl{color:#888;font-size:0.85rem;margin-top:5px}
+        @media(max-width:768px){.header h1{font-size:1.8rem}.game-types{grid-template-columns:1fr}.choices{grid-template-columns:1fr}.emoji-puzzle{font-size:2.5rem}.timer{position:relative;display:table;margin:0 auto 15px}}
+        .confetti{position:fixed;width:10px;height:10px;top:-10px;animation:fall 4s linear forwards;pointer-events:none}
+        @keyframes fall{to{transform:translateY(110vh) rotate(720deg);opacity:0}}
+    </style>
+</head>
+<body>
+<div class="container">
+    <header class="header">
+        <h1>🎮 BRAIN BATTLE</h1>
+        <p class="sub">🌍 Global Team Challenge!</p>
+    </header>
+    <div class="timer" id="timer-display" style="display:none">⏱️ <span id="timer">00:15</span></div>
+    <div class="score-bar" id="score-bar" style="display:none">
+        <div class="team-info">
+            <span>🏆</span>
+            <span class="team-name" id="team-display">Team</span>
+        </div>
+        <div class="score">Score: <span id="score">0</span></div>
+        <div class="round-info">Round <span id="round-num">1</span>/15</div>
+    </div>
+
+    <!-- WELCOME -->
+    <div class="screen active" id="welcome">
+        <div class="welcome">
+            <span class="mascot">🧠🎮</span>
+            <h2 style="font-family:'Fredoka One';color:var(--secondary);margin-bottom:10px">3 GAMES, 15 ROUNDS, 1 WINNER!</h2>
+            <div class="game-types">
+                <div class="game-type">
+                    <div class="icon">🎬</div>
+                    <h4>EMOJI GUESS</h4>
+                    <p>Guess movies, brands, countries from emojis!</p>
+                </div>
+                <div class="game-type">
+                    <div class="icon">🔍</div>
+                    <h4>BLURRED IMAGE</h4>
+                    <p>Identify objects from blurry pictures!</p>
+                </div>
+                <div class="game-type">
+                    <div class="icon">🧩</div>
+                    <h4>PATTERN PUZZLE</h4>
+                    <p>Find the pattern, pick the answer!</p>
+                </div>
+            </div>
+            <div class="input-section">
+                <label>🏅 Enter Your Team Name:</label>
+                <input type="text" id="teamName" placeholder="e.g., Brain Masters" maxlength="25">
+            </div>
+            <button class="btn btn-primary" onclick="startGame()">🚀 START CHALLENGE!</button>
+            <div class="leaderboard" id="welcome-lb">
+                <h3>🏆 HALL OF FAME 🏆</h3>
+                <table class="lb-table"><thead><tr><th>Rank</th><th>Team</th><th>Score</th><th>Time</th></tr></thead><tbody id="lb-body"><tr><td colspan="4" style="color:#666;padding:20px">No teams yet! Be the first! 🎯</td></tr></tbody></table>
+            </div>
+        </div>
+    </div>
+
+    <!-- GAME ROUNDS -->
+    <div class="screen" id="game">
+        <div class="game-card">
+            <span class="round-badge" id="round-badge">Round 1</span>
+            <span class="category-badge" id="category-badge">🎬 Emoji Guess</span>
+            <div class="puzzle-area" id="puzzle-area">
+                <!-- Puzzle content loads here -->
+            </div>
+            <div class="choices" id="choices">
+                <!-- Choices load here -->
+            </div>
+            <div class="feedback" id="feedback"></div>
+            <div style="text-align:center;margin-top:15px">
+                <button class="btn btn-primary" id="submit-btn" onclick="submitAnswer()">✓ SUBMIT</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- VICTORY -->
+    <div class="screen" id="victory">
+        <div class="victory">
+            <span class="trophy">🏆</span>
+            <h2>BRAIN BATTLE CHAMPION!</h2>
+            <p style="color:var(--secondary);font-size:1.1rem">🎉 <span id="winner"></span> WINS! 🎉</p>
+            <div class="final-score"><span id="final-score">0</span> pts</div>
+            <div class="stats">
+                <div class="stat"><div class="val" id="v-correct">0</div><div class="lbl">✓ Correct</div></div>
+                <div class="stat"><div class="val" id="v-time">00:00</div><div class="lbl">⏱️ Total Time</div></div>
+                <div class="stat"><div class="val" id="v-streak">0</div><div class="lbl">🔥 Best Streak</div></div>
+            </div>
+            <div style="margin-top:20px">
+                <button class="btn btn-primary" onclick="playAgain()">🔄 PLAY AGAIN</button>
+                <button class="btn btn-secondary" onclick="showLB()" style="margin-left:10px">🏆 LEADERBOARD</button>
+            </div>
+            <div class="leaderboard" id="final-lb" style="display:none;margin-top:25px">
+                <h3>🏆 TOP SCORES 🏆</h3>
+                <table class="lb-table"><thead><tr><th>Rank</th><th>Team</th><th>Score</th><th>Time</th></tr></thead><tbody id="final-lb-body"></tbody></table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const ROUNDS = [
+    // EMOJI GUESS - Movies (1-5)
+    {type:'emoji',category:'🎬 Movie',puzzle:'🕷️🧑',choices:['Spider-Man','Ant-Man','Iron Man','Batman'],answer:0,points:100},
+    {type:'emoji',category:'🎬 Movie',puzzle:'🦁👑',choices:['Jungle Book','Lion King','Madagascar','Zootopia'],answer:1,points:100},
+    {type:'emoji',category:'🎬 Movie',puzzle:'🧊❄️👸',choices:['Snow White','Frozen','Ice Age','Elsa'],answer:1,points:100},
+    {type:'emoji',category:'🎬 Movie',puzzle:'🚢💔🧊',choices:['Titanic','Jaws','Poseidon','Pirates'],answer:0,points:100},
+    {type:'emoji',category:'🎬 Movie',puzzle:'👻👻👻🚫',choices:['Casper','Ghostbusters','Paranormal','Conjuring'],answer:1,points:100},
+    
+    // EMOJI GUESS - Brands/Things (6-8)
+    {type:'emoji',category:'🏢 Brand',puzzle:'🍎📱',choices:['Samsung','Apple','Nokia','Huawei'],answer:1,points:100},
+    {type:'emoji',category:'🌍 Country',puzzle:'🗼🥐🍷',choices:['Italy','Spain','France','Germany'],answer:2,points:100},
+    {type:'emoji',category:'🍔 Food',puzzle:'🍕🇮🇹',choices:['Pasta','Pizza','Burger','Taco'],answer:1,points:100},
+    
+    // PATTERN PUZZLES (9-12)
+    {type:'pattern',category:'🧩 Pattern',puzzle:'🔴🔵🔴🔵🔴❓',choices:['🔴','🔵','🟢','🟡'],answer:1,points:150},
+    {type:'pattern',category:'🧩 Pattern',puzzle:'2, 4, 8, 16, ❓',choices:['24','30','32','36'],answer:2,points:150},
+    {type:'pattern',category:'🧩 Odd One Out',puzzle:'🍎🍎🍊🍎🍎',choices:['First 🍎','Third 🍊','Last 🍎','None'],answer:1,points:150},
+    {type:'pattern',category:'🧩 Pattern',puzzle:'⬆️➡️⬇️⬅️⬆️❓',choices:['⬆️','➡️','⬇️','⬅️'],answer:1,points:150},
+    
+    // VISUAL PUZZLES (13-15)
+    {type:'visual',category:'🔍 What Is This?',puzzle:'🟫⬜🟫⬜🟫⬜🟫⬜',hint:'You play on it',choices:['Piano','Chess Board','Keyboard','Zebra'],answer:1,points:200},
+    {type:'visual',category:'🔍 Complete It',puzzle:'H₂❓',hint:'You drink it',choices:['O (Water)','S (Acid)','N (Ammonia)','C (Methane)'],answer:0,points:200},
+    {type:'visual',category:'🧩 Math',puzzle:'🍕+🍕+🍕=30<br>🍕+🍔+🍔=20<br>🍔+🌮+🌮=9<br>🌮+🍕+🍔=❓',hint:'Solve step by step',choices:['14','15','16','17'],answer:1,points:250}
+];
+
+let G = {
+    team: '',
+    round: 0,
+    score: 0,
+    correct: 0,
+    streak: 0,
+    bestStreak: 0,
+    startTime: null,
+    roundTime: 15,
+    timer: null,
+    selected: null
+};
+
+function loadLB() {
+    const l = JSON.parse(localStorage.getItem('brainBattleV1') || '[]');
+    updateLB(l, 'lb-body');
+}
+
+function updateLB(l, id) {
+    const t = document.getElementById(id);
+    if (!l.length) {
+        t.innerHTML = '<tr><td colspan="4" style="color:#666;padding:20px">No teams yet! Be the first! 🎯</td></tr>';
+        return;
+    }
+    l.sort((a, b) => b.score - a.score);
+    t.innerHTML = l.slice(0, 10).map((e, i) => `
+        <tr class="${i < 3 ? 'rank-' + (i + 1) : ''}">
+            <td>${['🥇', '🥈', '🥉'][i] || '🏅'} ${i + 1}</td>
+            <td>${e.name}</td>
+            <td>${e.score}</td>
+            <td>${e.time}</td>
+        </tr>
+    `).join('');
+}
+
+function startGame() {
+    const name = document.getElementById('teamName').value.trim();
+    if (!name) {
+        document.getElementById('teamName').placeholder = '⚠️ Enter team name!';
+        return;
+    }
+    G.team = name;
+    G.round = 0;
+    G.score = 0;
+    G.correct = 0;
+    G.streak = 0;
+    G.bestStreak = 0;
+    G.startTime = Date.now();
+    
+    document.getElementById('score-bar').style.display = 'flex';
+    document.getElementById('timer-display').style.display = 'block';
+    document.getElementById('team-display').textContent = name;
+    document.getElementById('score').textContent = '0';
+    
+    loadRound();
+}
+
+function loadRound() {
+    if (G.round >= ROUNDS.length) {
+        endGame();
+        return;
+    }
+    
+    const r = ROUNDS[G.round];
+    G.selected = null;
+    
+    document.getElementById('round-num').textContent = G.round + 1;
+    document.getElementById('round-badge').textContent = `Round ${G.round + 1}`;
+    document.getElementById('category-badge').textContent = r.category;
+    
+    // Load puzzle
+    const puzzleArea = document.getElementById('puzzle-area');
+    if (r.type === 'emoji' || r.type === 'pattern' || r.type === 'visual') {
+        puzzleArea.innerHTML = `<div class="${r.type === 'emoji' ? 'emoji-puzzle' : 'pattern-puzzle'}">${r.puzzle}</div>`;
+        if (r.hint) {
+            puzzleArea.innerHTML += `<p style="color:#888;font-size:0.9rem;margin-top:15px">💡 Hint: ${r.hint}</p>`;
+        }
+    }
+    
+    // Load choices
+    const choicesDiv = document.getElementById('choices');
+    choicesDiv.innerHTML = r.choices.map((c, i) => `
+        <button class="choice" onclick="selectChoice(${i})" data-idx="${i}">${c}</button>
+    `).join('');
+    
+    // Reset feedback
+    document.getElementById('feedback').className = 'feedback';
+    document.getElementById('submit-btn').disabled = false;
+    
+    // Start timer
+    startRoundTimer();
+    
+    show('game');
+}
+
+function startRoundTimer() {
+    G.roundTime = 15;
+    updateTimerDisplay();
+    clearInterval(G.timer);
+    G.timer = setInterval(() => {
+        G.roundTime--;
+        updateTimerDisplay();
+        if (G.roundTime <= 5) {
+            document.getElementById('timer-display').classList.add('warn');
+        }
+        if (G.roundTime <= 0) {
+            clearInterval(G.timer);
+            timeUp();
+        }
+    }, 1000);
+}
+
+function updateTimerDisplay() {
+    document.getElementById('timer').textContent = `00:${String(G.roundTime).padStart(2, '0')}`;
+}
+
+function selectChoice(idx) {
+    document.querySelectorAll('.choice').forEach(c => c.classList.remove('selected'));
+    document.querySelector(`.choice[data-idx="${idx}"]`).classList.add('selected');
+    G.selected = idx;
+}
+
+function submitAnswer() {
+    if (G.selected === null) {
+        showFeedback(false, '👆 Select an answer first!');
+        return;
+    }
+    
+    clearInterval(G.timer);
+    const r = ROUNDS[G.round];
+    const isCorrect = G.selected === r.answer;
+    
+    // Show correct/wrong on choices
+    document.querySelectorAll('.choice').forEach((c, i) => {
+        if (i === r.answer) c.classList.add('correct');
+        else if (i === G.selected && !isCorrect) c.classList.add('wrong');
+        c.style.pointerEvents = 'none';
+    });
+    
+    if (isCorrect) {
+        const timeBonus = G.roundTime * 5;
+        const points = r.points + timeBonus;
+        G.score += points;
+        G.correct++;
+        G.streak++;
+        if (G.streak > G.bestStreak) G.bestStreak = G.streak;
+        
+        document.getElementById('score').textContent = G.score;
+        showFeedback(true, `✓ Correct! +${points} pts (${timeBonus} time bonus)`);
+        showPointsPopup(`+${points}`);
+    } else {
+        G.streak = 0;
+        showFeedback(false, `✗ Wrong! Answer: ${r.choices[r.answer]}`);
+    }
+    
+    document.getElementById('submit-btn').disabled = true;
+    
+    setTimeout(() => {
+        G.round++;
+        document.getElementById('timer-display').classList.remove('warn');
+        loadRound();
+    }, 2000);
+}
+
+function timeUp() {
+    const r = ROUNDS[G.round];
+    G.streak = 0;
+    
+    document.querySelectorAll('.choice').forEach((c, i) => {
+        if (i === r.answer) c.classList.add('correct');
+        c.style.pointerEvents = 'none';
+    });
+    
+    showFeedback(false, `⏰ Time's up! Answer: ${r.choices[r.answer]}`);
+    document.getElementById('submit-btn').disabled = true;
+    
+    setTimeout(() => {
+        G.round++;
+        document.getElementById('timer-display').classList.remove('warn');
+        loadRound();
+    }, 2000);
+}
+
+function showFeedback(success, msg) {
+    const fb = document.getElementById('feedback');
+    fb.className = 'feedback show ' + (success ? 'success' : 'error');
+    fb.textContent = msg;
+}
+
+function showPointsPopup(text) {
+    const popup = document.createElement('div');
+    popup.className = 'points-popup';
+    popup.textContent = text;
+    document.body.appendChild(popup);
+    setTimeout(() => popup.remove(), 1000);
+}
+
+function endGame() {
+    clearInterval(G.timer);
+    const elapsed = Math.floor((Date.now() - G.startTime) / 1000);
+    const timeStr = `${Math.floor(elapsed / 60)}:${String(elapsed % 60).padStart(2, '0')}`;
+    
+    // Save score
+    const scores = JSON.parse(localStorage.getItem('brainBattleV1') || '[]');
+    scores.push({ name: G.team, score: G.score, time: timeStr, ts: Date.now() });
+    localStorage.setItem('brainBattleV1', JSON.stringify(scores));
+    
+    // Show victory
+    document.getElementById('timer-display').style.display = 'none';
+    document.getElementById('score-bar').style.display = 'none';
+    document.getElementById('winner').textContent = G.team;
+    document.getElementById('final-score').textContent = G.score;
+    document.getElementById('v-correct').textContent = G.correct + '/' + ROUNDS.length;
+    document.getElementById('v-time').textContent = timeStr;
+    document.getElementById('v-streak').textContent = G.bestStreak;
+    
+    show('victory');
+    confetti();
+}
+
+function show(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+}
+
+function confetti() {
+    const colors = ['#6C5CE7', '#00CEC9', '#FD79A8', '#FDCB6E', '#00B894', '#E17055'];
+    for (let i = 0; i < 80; i++) {
+        setTimeout(() => {
+            const c = document.createElement('div');
+            c.className = 'confetti';
+            c.style.left = Math.random() * 100 + 'vw';
+            c.style.background = colors[Math.floor(Math.random() * colors.length)];
+            c.style.animationDuration = (Math.random() * 2 + 2) + 's';
+            document.body.appendChild(c);
+            setTimeout(() => c.remove(), 4000);
+        }, i * 30);
+    }
+}
+
+function showLB() {
+    const l = JSON.parse(localStorage.getItem('brainBattleV1') || '[]');
+    updateLB(l, 'final-lb-body');
+    document.getElementById('final-lb').style.display = 'block';
+}
+
+function playAgain() {
+    G = { team: '', round: 0, score: 0, correct: 0, streak: 0, bestStreak: 0, startTime: null, roundTime: 15, timer: null, selected: null };
+    document.getElementById('teamName').value = '';
+    document.getElementById('final-lb').style.display = 'none';
+    show('welcome');
+    loadLB();
+}
+
+window.onload = loadLB;
+</script>
+</body>
+</html>
+

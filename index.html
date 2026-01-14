@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏆 OFFICE OLYMPICS - The Ultimate Roast!</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        :root{--gold:#FFD700;--silver:#C0C0C0;--bronze:#CD7F32;--blue:#0085C7;--red:#DF0024;--yellow:#F4C300;--green:#009F3D;--dark:#1a1a2e;--card:#232342;--success:#00C851;--error:#ff4444}
+        body{font-family:'Poppins',sans-serif;background:linear-gradient(135deg,#1a1a2e,#16213e);color:#fff;min-height:100vh}
+        .container{max-width:900px;margin:0 auto;padding:15px}
+        .header{text-align:center;padding:20px 0}
+        .header h1{font-family:'Bebas Neue',cursive;font-size:2.8rem;background:linear-gradient(135deg,var(--gold),#FFA500);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:4px}
+        .header .sub{color:#ff6b6b;font-size:0.95rem;margin-top:5px;font-weight:600}
+        .timer{position:fixed;top:15px;right:15px;background:linear-gradient(135deg,var(--red),#ff6b6b);border-radius:12px;padding:10px 20px;font-family:'Bebas Neue',cursive;font-size:1.6rem;z-index:1000;letter-spacing:2px}
+        .timer.warn{animation:pulse .5s infinite}
+        @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+        .progress{background:var(--card);border-radius:15px;padding:15px;margin-bottom:20px;border:1px solid rgba(255,255,255,0.1)}
+        .progress-header{display:flex;justify-content:space-between;margin-bottom:10px;font-size:0.85rem;flex-wrap:wrap;gap:5px}
+        .team-name{font-family:'Bebas Neue',cursive;color:var(--gold);font-size:1.1rem;letter-spacing:1px}
+        .progress-bar{display:flex;gap:3px;flex-wrap:wrap}
+        .step{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;border:2px solid rgba(255,255,255,0.2);transition:all .3s}
+        .step.done{background:var(--success);border-color:var(--success)}
+        .step.active{background:var(--blue);border-color:var(--blue);animation:glow 1.5s infinite}
+        @keyframes glow{0%,100%{box-shadow:0 0 5px var(--blue)}50%{box-shadow:0 0 15px var(--blue)}}
+        .screen{display:none}
+        .screen.active{display:block;animation:slide .4s ease}
+        @keyframes slide{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+        .welcome{text-align:center;padding:20px 10px}
+        .mascot{font-size:3.5rem;margin-bottom:10px;display:inline-block;animation:bounce 2s infinite}
+        @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+        .story{background:var(--card);border-radius:15px;padding:25px;margin:20px auto;max-width:680px;border-left:4px solid var(--gold);text-align:left}
+        .story h3{font-family:'Bebas Neue',cursive;color:var(--gold);font-size:1.4rem;margin-bottom:12px;letter-spacing:2px}
+        .story p{font-size:0.92rem;line-height:1.7;margin-bottom:8px;color:#ccc}
+        .hl{color:var(--gold);font-weight:700}
+        .hlr{color:#ff6b6b;font-weight:700}
+        .tag{display:inline-block;background:var(--blue);color:#fff;padding:2px 8px;border-radius:10px;font-weight:600;font-size:0.8rem;margin:1px}
+        .tag.sonu{background:#e74c3c}.tag.tanveer{background:#3498db}.tag.sahil{background:#9b59b6}.tag.srk{background:#e67e22}.tag.harjeet{background:#27ae60}.tag.anuj{background:#16a085}.tag.anna{background:#d35400}.tag.sakshi{background:#e91e63}.tag.gurleen{background:#00bcd4}.tag.pratik{background:#795548}.tag.neha{background:#ff5722}.tag.nidhi{background:#8bc34a}.tag.shashank{background:#607d8b}.tag.jatin{background:#2196f3}.tag.tanmay{background:#673ab7}.tag.rishabh{background:#ff9800}
+        .input-section{margin:25px 0}
+        .input-section label{display:block;margin-bottom:8px;font-size:0.95rem;color:#aaa}
+        .input-section input{background:rgba(255,255,255,0.08);border:2px solid var(--blue);color:#fff;padding:12px 22px;font-size:1.1rem;border-radius:50px;width:100%;max-width:320px;text-align:center}
+        .input-section input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 15px rgba(255,215,0,0.3)}
+        .suggestions{margin-top:8px;font-size:0.75rem;color:#666}
+        .suggestions span{background:rgba(255,255,255,0.1);padding:3px 8px;border-radius:10px;margin:2px;display:inline-block;cursor:pointer}
+        .suggestions span:hover{background:var(--blue);color:#fff}
+        .btn{font-family:'Bebas Neue',cursive;font-size:1.1rem;padding:12px 32px;border:none;border-radius:50px;cursor:pointer;transition:all .3s;letter-spacing:2px}
+        .btn-primary{background:linear-gradient(135deg,var(--gold),#FFA500);color:#1a1a2e;box-shadow:0 5px 15px rgba(255,215,0,0.4)}
+        .btn-primary:hover{transform:translateY(-3px)}
+        .btn-secondary{background:transparent;border:2px solid var(--blue);color:var(--blue)}
+        .btn-hint{background:linear-gradient(135deg,#9b59b6,#8e44ad);color:#fff;font-size:0.85rem;padding:8px 16px}
+        .room{background:var(--card);border-radius:18px;padding:25px;margin-bottom:20px;border:1px solid rgba(255,255,255,0.1);position:relative;overflow:hidden}
+        .room::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--blue),var(--yellow),var(--green),var(--red))}
+        .room-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:10px}
+        .room-title{font-family:'Bebas Neue',cursive;font-size:1.4rem;display:flex;align-items:center;gap:8px;letter-spacing:1px}
+        .room-badge{background:linear-gradient(135deg,var(--blue),#0066aa);padding:4px 12px;border-radius:15px;font-family:'Bebas Neue',cursive;font-size:0.8rem;letter-spacing:1px}
+        .room-badge.special{background:linear-gradient(135deg,var(--red),#aa0000)}
+        .box{background:rgba(255,255,255,0.04);border-radius:12px;padding:20px;margin:12px 0;border:2px solid rgba(255,255,255,0.1)}
+        .box.blue{border-color:var(--blue);background:rgba(0,133,199,0.08)}
+        .box.yellow{border-color:var(--yellow);background:rgba(244,195,0,0.08)}
+        .box.green{border-color:var(--green);background:rgba(0,159,61,0.08)}
+        .box.red{border-color:#ff6b6b;background:rgba(255,107,107,0.08)}
+        .box.purple{border-color:#9b59b6;background:rgba(155,89,182,0.08)}
+        .box.orange{border-color:#e67e22;background:rgba(230,126,34,0.08)}
+        .text{font-size:1rem;line-height:1.8;color:#fff;text-align:center}
+        .scenario{background:rgba(255,255,255,0.05);border-radius:10px;padding:15px;margin:12px 0;border-left:3px solid var(--yellow)}
+        .scenario .title{color:var(--yellow);font-weight:700;margin-bottom:8px;font-size:0.9rem}
+        .scenario p{color:#ddd;line-height:1.7;font-size:0.95rem;margin-bottom:5px}
+        .answer{margin-top:20px;text-align:center}
+        .answer-input{background:rgba(0,0,0,0.3);border:2px solid var(--blue);color:#fff;padding:12px 20px;font-size:1rem;border-radius:50px;width:100%;max-width:350px;text-align:center}
+        .choices{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;max-width:560px;margin:18px auto}
+        .choice{background:rgba(255,255,255,0.06);border:2px solid rgba(255,255,255,0.15);color:#fff;padding:14px;border-radius:12px;font-size:0.9rem;cursor:pointer;transition:all .3s;text-align:left}
+        .choice:hover{background:rgba(0,133,199,0.15);border-color:var(--blue)}
+        .choice.selected{background:var(--blue);border-color:var(--blue)}
+        .choice .letter{display:inline-block;width:24px;height:24px;background:rgba(255,255,255,0.2);border-radius:50%;text-align:center;line-height:24px;margin-right:8px;font-weight:700;font-size:0.8rem}
+        .choice.selected .letter{background:#fff;color:var(--blue)}
+        .feedback{padding:12px 20px;border-radius:10px;margin:12px 0;text-align:center;font-size:0.95rem;font-weight:600;display:none}
+        .feedback.show{display:block;animation:pop .4s ease}
+        .feedback.success{background:linear-gradient(135deg,var(--success),#00a844)}
+        .feedback.error{background:linear-gradient(135deg,var(--error),#cc0000)}
+        @keyframes pop{0%{transform:scale(0.8);opacity:0}50%{transform:scale(1.05)}100%{transform:scale(1);opacity:1}}
+        .hint-section{margin-top:22px;text-align:center}
+        .hint-box{background:rgba(155,89,182,0.12);border:2px dashed #9b59b6;border-radius:10px;padding:12px;margin-top:10px;display:none}
+        .hint-box.show{display:block}
+        .hint-box p{color:#bb8fce;font-size:0.9rem}
+        .hints-left{color:#888;margin-top:8px;font-size:0.75rem}
+        .quote{background:rgba(244,195,0,0.08);border-left:3px solid var(--yellow);padding:10px 15px;margin:12px 0;border-radius:0 8px 8px 0;font-style:italic;color:#ddd;font-size:0.88rem}
+        .leaderboard{background:var(--card);border-radius:15px;padding:20px;margin-top:25px;border:2px solid var(--gold)}
+        .leaderboard h3{font-family:'Bebas Neue',cursive;color:var(--gold);text-align:center;font-size:1.5rem;margin-bottom:12px;letter-spacing:2px}
+        .lb-table{width:100%;border-collapse:collapse;font-size:0.85rem}
+        .lb-table th,.lb-table td{padding:10px 6px;text-align:center}
+        .lb-table th{color:var(--blue);font-family:'Bebas Neue',cursive;border-bottom:1px solid rgba(255,255,255,0.1)}
+        .rank-1{color:var(--gold)!important;font-weight:700}
+        .rank-2{color:var(--silver)!important}
+        .rank-3{color:var(--bronze)!important}
+        .victory{text-align:center;padding:30px 15px}
+        .trophy{font-size:5rem;display:block;margin-bottom:10px;animation:spin 1s infinite}
+        @keyframes spin{0%,100%{transform:rotate(-5deg) scale(1)}50%{transform:rotate(5deg) scale(1.1)}}
+        .victory h2{font-family:'Bebas Neue',cursive;font-size:2.5rem;background:linear-gradient(135deg,var(--gold),#FFA500);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:3px;margin-bottom:8px}
+        .stats{display:flex;justify-content:center;gap:18px;margin:25px 0;flex-wrap:wrap}
+        .stat{background:var(--card);border-radius:12px;padding:18px 30px;border:2px solid var(--blue)}
+        .stat .val{font-family:'Bebas Neue',cursive;font-size:2rem;color:var(--gold)}
+        .stat .lbl{color:#888;font-size:0.8rem;margin-top:4px}
+        .win-msg{background:rgba(0,200,81,0.1);border-radius:12px;padding:15px;max-width:520px;margin:20px auto;border:1px solid var(--success)}
+        .win-msg p{font-size:0.95rem;line-height:1.6;color:#8f8;margin-bottom:5px}
+        @media(max-width:768px){.header h1{font-size:2rem}.timer{position:relative;margin:0 auto 12px;display:table;font-size:1.3rem}.room{padding:18px}.choices{grid-template-columns:1fr}.stats{flex-direction:column;align-items:center}.step{width:24px;height:24px;font-size:0.6rem}}
+        .confetti{position:fixed;width:10px;height:10px;top:-15px;animation:fall 4s linear forwards}
+        @keyframes fall{to{transform:translateY(110vh) rotate(1080deg);opacity:0}}
+    </style>
+</head>
+<body>
+<div class="container">
+    <header class="header">
+        <h1>🏆 OFFICE OLYMPICS 🏆</h1>
+        <p class="sub">🔥 THE ULTIMATE ROAST EDITION 🔥</p>
+    </header>
+    <div class="timer" id="timer-display" style="display:none">⏱️ <span id="timer">30:00</span></div>
+    <div class="progress" id="progress-container" style="display:none">
+        <div class="progress-header">
+            <span class="team-name">🏅 <span id="team-display">-</span></span>
+            <span style="color:#888">15 Rounds!</span>
+        </div>
+        <div class="progress-bar" id="progress-bar"></div>
+    </div>
+
+    <!-- WELCOME -->
+    <div class="screen active" id="welcome">
+        <div class="welcome">
+            <span class="mascot">🔥😂</span>
+            <div class="story">
+                <h3>🚨 THE ROAST BEGINS! 🚨</h3>
+                <p>Welcome to the <span class="hl">ULTIMATE TEAM ROAST</span>! 🔥</p>
+                <p>⏰ <span class="hl">2 PM HUDDLE</span> = Hope | 🌙 <span class="hlr">8 PM CHECKPOINT</span> = Survival!</p>
+                <p style="margin-top:10px">🎯 <span class="hl">15 ROUNDS</span> • <span class="hl">30 MINUTES</span> • No mercy! 😈</p>
+            </div>
+            <div class="input-section">
+                <label>🏅 Your Team Name:</label>
+                <input type="text" id="teamName" placeholder="e.g., RCA Survivors" maxlength="25">
+                <div class="suggestions">
+                    <span onclick="setTeam('Checkpoint Escapers 🏃')">Checkpoint Escapers</span>
+                    <span onclick="setTeam('RCA Dodgers 📋')">RCA Dodgers</span>
+                    <span onclick="setTeam('Sahil Ka Darr 😱')">Sahil Ka Darr</span>
+                </div>
+            </div>
+            <button class="btn btn-primary" onclick="startGame()">🔥 START THE ROAST!</button>
+            <div class="leaderboard" id="welcome-lb">
+                <h3>🏆 ROAST SURVIVORS 🏆</h3>
+                <table class="lb-table"><thead><tr><th>Rank</th><th>Team</th><th>Time</th><th>Score</th></tr></thead><tbody id="lb-body"><tr><td colspan="4" style="color:#666;padding:20px">No survivors yet 😱</td></tr></tbody></table>
+            </div>
+        </div>
+    </div>
+
+    <!-- R1: SRK -->
+    <div class="screen" id="r1">
+        <div class="room">
+            <div class="room-header"><h2 class="room-title">🎬 BOLLYWOOD CONFUSION</h2><span class="room-badge special">SRK</span></div>
+            <div class="scenario">
+                <div class="title">📍 SCENE:</div>
+                <p>New joiner googles "Shahrukh Khan" expecting Bollywood...</p>
+                <p>Finds our <span class="tag srk">SHAHRUKH KHAN</span> - CRM SCRUM MASTER! 😂</p>
+            </div>
+            <div class="box orange">
+                <p class="text">What's the MAIN difference between Bollywood SRK and Our SRK?</p>
+            </div>
+            <div class="choices" id="choices1">
+                <button class="choice" onclick="select(1,this,'movies')"><span class="letter">A</span> Ours also does romantic scenes</button>
+                <button class="choice" onclick="select(1,this,'sprints')"><span class="letter">B</span> Ours romances SPRINT BACKLOGS, not heroines! 📊</button>
+                <button class="choice" onclick="select(1,this,'rich')"><span class="letter">C</span> Both are billionaires</button>
+                <button class="choice" onclick="select(1,this,'arms')"><span class="letter">D</span> Same person, different jobs</button>
+            </div>
+            <div class="quote">💬 "Bollywood SRK: 'Rahul, naam toh suna hoga' | Our SRK: 'Sprint velocity, naam toh suna hoga!'" 😂</div>
+            <div class="answer"><button class="btn btn-primary" onclick="check(1)">🎬 SUBMIT</button></div>
+            <div class="feedback" id="fb1"></div>
+            <div class="hint-section"><button class="btn btn-hint" onclick="hint(1)">💡 HINT</button><p class="hints-left">Hints: <span id="hl1">3</span></p><div class="hint-box" id="h1"><p>📊 He manages sprints, not scripts! No heroines here!</p></div></div>
+        </div>
+    </div>
+
+    <!-- R2: SONU RCA -->
+    <div class="screen" id="r2">
+        <div class="room">
+            <div class="room-header"><h2 class="room-title">📋 RCA ADDICTION</h2><span class="room-badge special">SONU</span></div>
+            <div class="scenario">
+                <div class="title">📍 ACTUAL CONVERSATION:</div>
+                <p>You: "I fixed a typo"</p>
+                <p><span class="tag sonu">SONU</span>: "Where's the RCA?"</p>
+                <p>You: "It was just a typo..."</p>
+                <p><span class="tag sonu">SONU</span>: "But WHY was there a typo? ROOT CAUSE!" 🔍</p>
+            </div>
+            <div class="box red">
+                <p class="text">If <span class="tag sonu">SONU</span> was a doctor, what would he prescribe?</p>
+            </div>
+            <div class="choices" id="choices2">
+                <button class="choice" onclick="select(2,this,'medicine')"><span class="letter">A</span> Medicine</button>
+                <button class="choice" onclick="select(2,this,'rca')"><span class="letter">B</span> An RCA for why you got sick! 📋</button>
+                <button class="choice" onclick="select(2,this,'rest')"><span class="letter">C</span> Rest</button>
+                <button class="choice" onclick="select(2,this,'surgery')"><span class="letter">D</span> Surgery</button>
+            </div>
+            <div class="quote">💬 "Patient: 'I have a headache' | Dr. Sonu: 'Fill this RCA form first!'" 😂</div>
+            <div class="answer"><button class="btn btn-primary" onclick="check(2)">📋 SUBMIT</button></div>
+            <div class="feedback" id="fb2"></div>
+            <div class="hint-section"><button class="btn btn-hint" onclick="hint(2)">💡 HINT</button><p class="hints-left">Hints: <span id="hl2">3</span></p><div class="hint-box" id="h2"><p>📋 Root Cause Analysis for EVERYTHING!</p></div></div>
+        </div>
+    </div>
+
+    <!-- R3: TANVEER EXPLAINS -->
+    <div class="screen" id="r3">
+        <div class="room">
+            <div class="room-header"><h2 class="room-title">📚 THE 5-HOUR ANSWER</h2><span class="room-badge special">TANVEER</span></div>
+            <div class="scenario">
+                <div class="title">📍 DANGER ZONE:</div>
+                <p>You: "Hey Tanveer, quick question - what time is lunch?"</p>
+                <p><span class="tag tanveer">TANVEER</span>: "Great question! Let me explain the history of lunch breaks, how they connect to productivity..."</p>
+                <p>*3 hours later* "...and that's why it's 1 PM." 😅</p>
+            </div>
+            <div class="box blue">
+                <p class="text">What happens when you ask <span class="tag tanveer">TANVEER</span> a "quick question"?</p>
+            </div>
+            <div class="choices" id="choices3">
+                <button class="choice" onclick="select(3,this,'quick')"><span class="letter">A</span> You get a quick answer</button>
+                <button class="choice" onclick="select(3,this,'history')"><span class="letter">B</span> You get the ENTIRE HISTORY! 📚</button>
+                <button class="choice" onclick="select(3,this,'idk')"><span class="letter">C</span> He says "I don't know"</button>
+                <button class="choice" onclick="select(3,this,'google')"><span class="letter">D</span> He googles it</button>
+            </div>
+            <div class="quote">💬 "Ask Tanveer for directions to the bathroom, learn the building's entire plumbing history!" 😂</div>
+            <div class="answer"><button class="btn btn-primary" onclick="check(3)">📚 SUBMIT</button></div>
+            <div class="feedback" id="fb3"></div>
+            <div class="hint-section"><button class="btn btn-hint" onclick="hint(3)">💡 HINT</button><p class="hints-left">Hints: <span id="hl3">3</span></p><div class="hint-box" id="h3"><p>📚 He NEVER gives short answers!</p></div></div>
+        </div>
+    </div>
+
+    <!-- R4: HARJEET OMS -->
+    <div class="screen" id="r4">
+        <div class="room">
+            <div class="room-header"><h2 class="room-title">🧠 OMS OVERLOAD</h2><span class="room-badge special">HARJEET</span></div>
+            <div class="scenario">
+                <div class="title">📍 THE TRAP:</div>
+                <p>You: "Harjeet, is this order stuck?"</p>
+                <p><span class="tag harjeet">HARJEET</span>: "Let me explain how orders work from 1995..."</p>
+                <p>You: "I just need a yes or no..."</p>
+                <p><span class="tag harjeet">HARJEET</span>: "...first, understand the OMS architecture..." 🏛️</p>
+                <p>Everyone goes to him for OMS doubts! 🧠</p>
+            </div>
+            <div class="box green">
+                <p class="text">What's the MINIMUM time for an OMS answer from <span class="tag harjeet">HARJEET</span>?</p>
+            </div>
+            <div class="choices" id="choices4">
+                <button class="choice" onclick="select(4,this,'1min')"><span class="letter">A</span> 1 minute (haha, nice joke!)</button>
+                <button class="choice" onclick="select(4,this,'30min')"><span class="letter">B</span> 30+ minutes with full architecture! 🏛️</button>
+                <button class="choice" onclick="select(4,this,'never')"><span class="letter">C</span> He refuses to answer</button>
+                <button class="choice" onclick="select(4,this,'email')"><span class="letter">D</span> He emails you instead</button>
+            </div>
+            <div class="quote">💬 "Harjeet's shortest answer is longer than most people's presentations!" 😂</div>
+            <div class="answer"><button class="btn btn-primary" onclick="check(4)">🧠 SUBMIT</button></div>
+            <div class="feedback" id="fb4"></div>
+            <div class="hint-section"><button class="btn btn-hint" onclick="hint(4)">💡 HINT</button><p class="hints-left">Hints: <span id="hl4">3</span></p><div class="hint-box" id="h4"><p>🏛️ He gives you the FULL architecture tour!</p></div></div>
+        </div>
+    </div>
+
+    <!-- R5: ANUJ INVISIBLE -->
+    <div class="screen" id="r5">
+        <div class="room">
+            <div class="room-header"><h2 class="room-title">👻 THE INVISIBLE MAN</h2><span class="room-badge special">ANUJ</span></div>
+            <div class="scenario">
+                <div class="title">📍 LEGEND SAYS:</div>
+                <p>Some say <span class="tag anuj">ANUJ KABRA</span> was available once... in 2019.</p>
+                <p>His Teams status: 🔴 BUSY (since birth)</p>
+                <p>His calendar: Booked till 2087</p>
+                <p>CRM MASTER but impossible to catch! 🦄</p>
+            </div>
+            <div class="box purple">
+                <p class="text">What's harder than solving P1 incidents?</p>
+            </div>
+            <div class="choices" id="choices5">
+                <button class="choice" onclick="select(5,this,'crm')"><span class="letter">A</span> Understanding CRM</button>
+                <button class="choice" onclick="select(5,this,'catching')"><span class="letter">B</span> CATCHING ANUJ WHEN HE'S FREE! 👻</button>
+                <button class="choice" onclick="select(5,this,'rca')"><span class="letter">C</span> Writing RCAs for Sonu</button>
+                <button class="choice" onclick="select(5,this,'checkpoint')"><span class="letter">D</span> Surviving Checkpoint</button>
+            </div>
+            <div class="quote">💬 "I scheduled a meeting with Anuj. My grandchildren will attend it!" 😂</div>
+            <div class="answer"><button class="btn btn-primary" onclick="check(5)">👻 SUBMIT</button></div>
+            <div class="feedback" id="fb5"></div>
+            <div class="hint-section"><button class="btn btn-hint" onclick="hint(5)">💡 HINT</button><p class="hints-left">Hints: <span id="hl5">3</span></p><div class="hint-box" id="h5"><p>👻 He's the CRM master but IMPOSSIBLE to catch!</p></div></div>
+        </div>
+    </div>
+
+    <!-- R6: NEHA -->
+    <div class="screen" id="r6">
+        <div class="room">
+            <div class="room-header"><h2 class="room-title">📧 THE "I TOLD YOU SO" QUEEN</h2><span class="room-badge special">NEHA</span></div>
+            <div class="scenario">
+                <div class="title">📍 EVERY INCIDENT EVER:</div>
+                <p>*System crashes*</p>
+                <p>Team: "Oh no! What happened?!"</p>
+                <p><span class="tag neha">NEHA UPPAL</span>: *Appears from nowhere*</p>
+                <p>"I KNEW this would happen. I said it 6 months ago. Nobody listened." 🙄</p>
+                <p>"I sent an email. In 2021. Check your inbox." 📧</p>
+            </div>
+            <div class="box orange">
+                <p class="text">After EVERY incident, what does <span class="tag neha">NEHA</span> always say?</p>
+            </div>
+            <div class="choices" id="choices6">
+                <button class="choice" onclick="select(6,this,'surprised')"><span class="letter">A</span> "Wow, I'm surprised!"</button>
+                <button class="choice" onclick="select(6,this,'toldyou')"><span class="letter">B</span> "I TOLD YOU SO!" Check my 2021 email! 📧</button>
+                <button class="choice" onclick="select(6,this,'help')"><span class="letter">C</span> "Let me help you fix it!"</button>
+                <button class="choice" onclick="select(6,this,'idk')"><span class="letter">D</span> "I had no idea!"</button>
+            </div>
+            <div class="quote">💬 "Neha's email from 2021 is still waiting to be acknowledged!" 😂</div>
+            <div class="answer"><button class="btn btn-primary" onclick="check(6)">📧 SUBMIT</button></div>
+            <div class="feedback" id="fb6"></div>
+            <div class="hint-section"><button class="btn btn-hint" onclick="hint(6)">💡 HINT</button><p class="hints-left">Hints: <span id="hl6">3</span></p><div class="hint-box" id="h6"><p>🙄 She ALWAYS has an old email to prove she was right!</p></div></div>
+        </div>
+    </div>
+
+    <!-- R7: NIDHI -->
+    <div class="screen" id="r7">
+        <div class="room">
+            <div class="room-header"><h2 class="room-title">👸 THE CRM QUEEN</h2><span class="room-badge special">NIDHI</span></div>
+            <div class="scenario">
+                <div class="title">📍 CRM KINGDOM:</div>
+                <p>Junior: "How do I fix this CRM issue?"</p>
+                <p>Team: "Ask the CRM MASTER!"</p>
+                <p>Junior: "Who's that?"</p>
+                <p>Team: "There's only ONE. <span class="tag nidhi">NIDHI YADAV</span>!" 👸</p>
+                <p>When CRM breaks, everyone runs to her!</p>
+            </div>
+            <div class="box yellow">
+                <p class="text">When CRM has issues, what does everyone do?</p>
+            </div>
+            <div class="choices" id="choices7">
+                <button class="choice" onclick="select(7,this,'google')"><span class="letter">A</span> Google the solution</button>
+                <button class="choice" onclick="select(7,this,'nidhi')"><span class="letter">B</span> Run to NIDHI! "Nidhi please help!" 🏃👸</button>
+                <button class="choice" onclick="select(7,this,'ignore')"><span class="letter">C</span> Ignore and hope it fixes itself</button>
+                <button class="choice" onclick="select(7,this,'restart')"><span class="letter">D</span> Restart the computer</button>
+            </div>
+            <div class="quote">💬 "CRM problem? Nidhi is the answer. Always!" 😂</div>
+            <div class="answer"><button class="btn btn-primary" onclick="check(7)">👸 SUBMIT</button></div>
+            <div class="feedback" id="fb7"></div>
+            <div class="hint-section"><button class="btn btn-hint" onclick="hint(7)">💡 HINT</button><p class="hints-left">Hints: <span id="hl7">3</span></p><div class="hint-box" id="h7"><p>👸 THE CRM MASTER! Yadav ji!</p></div></div>
+        </div>
+    </div>
+
+    <!-- R8: TANMAY -->
+    <div class="screen" id="r8">
+        <div class="room">
+            <div class="room-header"><h2 class="room-title">😤 THE LATERAL ATTITUDE</h2><span class="room-badge special">TANMAY</span></div>
+            <div class="scenario">
+                <div class="title">📍 DAILY TANMAY LIFE:</div>
+                <p>Team: "Hey Tanmay, let us explain how this works..."</p>
+                <p><span class="tag tanmay">TANMAY</span>: "Yaar, mujhe fresher mat samjho! Maine pehle bhi kiya hai!" 😤</p>
+                <p>Team: "Okay but here we do it differently..."</p>
+                <p><span class="tag tanmay">TANMAY</span>: "Previous company mein BETTER way tha!" 💅</p>
+                <p>Team: "Bhai hum toh washroom ka raasta bata rahe the..." 🚻😅</p>
+            </div>
+            <div class="box purple">
+                <p class="text">What does <span class="tag tanmay">TANMAY</span> say when anyone tries to explain something?</p>
+            </div>
+            <div class="choices" id="choices8">
+                <button class="choice" onclick="select(8,this,'teach')"><span class="letter">A</span> "Please teach me everything!"</button>
+                <button class="choice" onclick="select(8,this,'notfresher')"><span class="letter">B</span> "Yaar mujhe fresher mat samjho!" 😤</button>
+                <button class="choice" onclick="select(8,this,'thanks')"><span class="letter">C</span> "Thank you for explaining!"</button>
+                <button class="choice" onclick="select(8,this,'notes')"><span class="letter">D</span> *Takes detailed notes*</button>
+            </div>
+            <div class="quote">💬 "Tanmay's favorite phrase: 'Previous company mein...' - We get it bro!" 😂</div>
+            <div class="answer"><button class="btn btn-primary" onclick="check(8)">😤 SUBMIT</button></div>
+            <div class="feedback" id="fb8"></div>
+            <div class="hint-section"><button class="btn btn-hint" onclick="hint(8)">💡 HINT</button><p class="hints-left">Hints: <span id="hl8">3</span></p><div class="hint-box" id="h8"><p>😤 SVO Lateral = "Don't treat me like fresher!" vibes!</p></div></div>
+        </div>
+    </div>
+
+    <!-- R9: GURLEEN -->
+    <div class="screen" id="r9">
+        <div class="room">
+            <div class="room-header"><h2 class="room-title">🤯 BRAIN OVERLOAD</h2><span class="room-badge special">GURLEEN</span></div>
+            <div class="scenario">
+                <div class="title">📍 GURLEEN'S BRAIN:</div>
+                <p><span class="tag gurleen">GURLEEN</span> handles: OMS ✓ CRM ✓ MCSS ✓</p>
+                <p>Someone: "Gurleen, which system has this issue?"</p>
+                <p>Gurleen: "Umm... wait... *brain buffering* 🔄"</p>
+                <p>"Yeh OMS tha ya CRM? Ya MCSS? 🤔"</p>
+                <p>Brain = 50 Chrome tabs with NO memory left! 💀</p>
+            </div>
+            <div class="box blue">
+                <p class="text">What's <span class="tag gurleen">GURLEEN's</span> daily struggle with 3 apps?</p>
+            </div>
+            <div class="choices" id="choices9">
+                <button class="choice" onclick="select(9,this,'easy')"><span class="letter">A</span> Super easy to manage!</button>
+                <button class="choice" onclick="select(9,this,'confused')"><span class="letter">B</span> "Yeh kaunsa app hai yaar?" - CONFUSED! 🤯</button>
+                <button class="choice" onclick="select(9,this,'expert')"><span class="letter">C</span> Expert in all, no confusion</button>
+                <button class="choice" onclick="select(9,this,'quit')"><span class="letter">D</span> Wants to quit</button>
+            </div>
+            <div class="quote">💬 "Gurleen's brain: 'Loading... which app was this again?'" 😂</div>
+            <div class="answer"><button class="btn btn-primary" onclick="check(9)">🤯 SUBMIT</button></div>
+            <div class="feedback" id="fb9"></div>
+            <div class="hint-section"><button class="btn btn-hint" onclick="hint(9)">💡 HINT</button><p class="hints-left">Hints: <span id="hl9">3</span></p><div class="hint-box" id="h9"><p>🤯 3 applications = Brain overloaded! "Kaunsa app?"</p></div></div>
+        </div>
+    </div>
+
+    <!-- R10: PRATIK -->
+    <div class="screen" id="r10">
+        <div class="room">
+            <div class="room-header"><h2 class="room-title">🎯 SAHIL'S DEDICATED RESOURCE</h2><span class="room-badge special">PRATIK</span></div>
+            <div class="scenario">
+                <div class="title">📍 THE REALITY:</div>
+                <p><span class="tag pratik">PRATIK</span> = Testing Team Lead</p>
+                <p>But in reality...</p>
+                <p>Ask for testing: "Sahil ka kaam pehle!"</p>
+                <p>Ask for priority: "Sahil ka kaam pehle!"</p>
+                <p>Ask for ANYTHING: "Sahil ka kaam pehle!"</p>
+                <p>Others: "What about us?" | Pratik: "Line mein lago!" 🙏</p>
+            </div>
+            <div class="box green">
+                <p class="text"><span class="tag pratik">PRATIK</span> basically works for...?</p>
+            </div>
+            <div class="choices" id="choices10">
+                <button class="choice" onclick="select(10,this,'everyone')"><span class="letter">A</span> Everyone equally</button>
+                <button class="choice" onclick="select(10,this,'sahil')"><span class="letter">B</span> ONLY SAHIL! Baki sab line mein! 🎯</button>
+                <button class="choice" onclick="select(10,this,'himself')"><span class="letter">C</span> Only himself</button>
+                <button class="choice" onclick="select(10,this,'random')"><span class="letter">D</span> Random selection daily</button>
+            </div>
+            <div class="quote">💬 "Pratik's priority list: 1. Sahil 2. Sahil 3. Sahil ... 99. Others!" 😂</div>
+            <div class="answer"><button class="btn btn-primary" onclick="check(10)">🎯 SUBMIT</button></div>
+            <div class="feedback" id="fb10"></div>
+            <div class="hint-section"><button class="btn btn-hint" onclick="hint(10)">💡 HINT</button><p class="hints-left">Hints: <span id="hl10">3</span></p><div class="hint-box" id="h10"><p>🎯 Sahil ka dedicated resource! Others? Wait karo!</p></div></div>
+        </div>
+    </div>
+
+    <!-- R11: SHASHANK -->
+    <div class="screen" id="r11">
+        <div class="room">
+            <div class="room-header"><h2 class="room-title">🔍 THE CURIOUS TESTER</h2><span class="room-badge special">SHASHANK</span></div>
+            <div class="scenario">
+                <div class="title">📍 TESTING SESSION:</div>
+                <p><span class="tag shashank">SHASHANK DUTTA</span> testing a button...</p>
+                <p>"But WHY does this button do this?"</p>
+                <p>"But WHAT IF I click here instead?"</p>
+                <p>"But HOW does this connect to that?"</p>
+                <p>Devs: "Just test it normally please 😭"</p>
+                <p>Shashank: "But I found 47 edge cases!" 🧐</p>
+            </div>
+            <div class="box orange">
+                <p class="text">What's <span class="tag shashank">SHASHANK's</span> testing style?</p>
+            </div>
+            <div class="choices" id="choices11">
+                <button class="choice" onclick="select(11,this,'simple')"><span class="letter">A</span> Simple click and approve</button>
+                <button class="choice" onclick="select(11,this,'curious')"><span class="letter">B</span> ENDLESS CURIOSITY! "But why? But how?" 🔍</button>
+                <button class="choice" onclick="select(11,this,'skip')"><span class="letter">C</span> Skip testing, trust devs</button>
+                <button class="choice" onclick="select(11,this,'random')"><span class="letter">D</span> Random clicking</button>
+            </div>
+            <div class="quote">💬 "Shashank finds bugs that devs didn't even know could exist!" 😂</div>
+            <div class="answer"><button class="btn btn-primary" onclick="check(11)">🔍 SUBMIT</button></div>
+            <div class="feedback" id="fb11"></div>
+            <div class="hint-section"><button class="btn btn-hint" onclick="hint(11)">💡 HINT</button><p class="hints-left">Hints: <span id="hl11">3</span></p><div class="hint-box" id="h11"><p>🧐 Tester with UNLIMITED curiosity! Dutta!</p></div></div>
+        </div>
+    </div>
+
+    <!-- R12: JATIN + RISHABH -->
+    <div class="screen" id="r12">
+        <div class="room">
+            <div class="room-header"><h2 class="room-title">🎮 SVO SQUAD</h2><span class="room-badge special">JATIN + RISHABH</span></div>
+            <div class="scenario">
+                <div class="title">📍 SVO VIBES:</div>
+                <p><span class="tag jatin">JATIN KUSHWAHA</span> + <span class="tag rishabh">RISHABH KATIYAR</span></p>
+                <p>Manager: "Where are the SVO guys?"</p>
+                <p>Team: "Probably together somewhere!"</p>
+                <p>These two + Tanmay = SVO squad goals! 👯‍♂️</p>
+                <p>SVO energy: MAXIMUM! ⚡</p>
+            </div>
+            <div class="box purple">
+                <p class="text">What happens when you need both <span class="tag jatin">JATIN</span> and <span class="tag rishabh">RISHABH</span>?</p>
+            </div>
+            <div class="choices" id="choices12">
+                <button class="choice" onclick="select(12,this,'separate')"><span class="letter">A</span> They're never together</button>
+                <button class="choice" onclick="select(12,this,'together')"><span class="letter">B</span> Find one, find both! SVO package deal! 🎮</button>
+                <button class="choice" onclick="select(12,this,'hide')"><span class="letter">C</span> They hide from work</button>
+                <button class="choice" onclick="select(12,this,'fight')"><span class="letter">D</span> They fight constantly</button>
+            </div>
+            <div class="quote">💬 "Kushwaha + Katiyar = SVO Dynamic Duo! Package deal!" 😂</div>
+            <div class="answer"><button class="btn btn-primary" onclick="check(12)">🎮 SUBMIT</button></div>
+            <div class="feedback" id="fb12"></div>
+            <div class="hint-section"><button class="btn btn-hint" onclick="hint(12)">💡 HINT</button><p class="hints-left">Hints: <span id="hl12">3</span></p><div class="hint-box" id="h12"><p>🎮 SVO squad! Always together!</p></div></div>
+        </div>
+    </div>
+
+    <!-- R13: SAHIL -->
+    <div class="screen" id="r13">
+        <div class="room">
+            <div class="room-header"><h2 class="room-title">👑 THE FINAL BOSS</h2><span class="room-badge special">SAHIL</span></div>
+            <div class="scenario">
+                <div class="title">📍 THE REALITY:</div>
+                <p>*<span class="tag sahil">SAHIL</span> joins the call*</p>
+                <p>Everyone's webcam: Suddenly ON 📸</p>
+                <p>Everyone's mute: Suddenly OFF 🎤</p>
+                <p>Everyone's posture: Suddenly STRAIGHT 🧍</p>
+                <p>Sahil: "So... any updates?"</p>
+                <p>Everyone: *typing speed increases by 500%* ⌨️💨</p>
+            </div>
+            <div class="box red">
+                <p class="text">When <span class="tag sahil">SAHIL</span> asks "Any issues?", the team's heart rate goes...</p>
+            </div>
+            <div class="choices" id="choices13">
+                <button class="choice" onclick="select(13,this,'calm')"><span class="letter">A</span> Stays calm and relaxed</button>
+                <button class="choice" onclick="select(13,this,'panic')"><span class="letter">B</span> 📈 TO THE MOON! Panic mode! 😰💓</button>
+                <button class="choice" onclick="select(13,this,'sleep')"><span class="letter">C</span> They fall asleep</button>
+                <button class="choice" onclick="select(13,this,'leave')"><span class="letter">D</span> They leave the call</button>
+            </div>
+            <div class="quote">💬 "Sahil's 'Let me check' = Someone's getting grilled today!" 😂</div>
+            <div class="answer"><button class="btn btn-primary" onclick="check(13)">👑 SUBMIT</button></div>
+            <div class="feedback" id="fb13"></div>
+            <div class="hint-section"><button class="btn btn-hint" onclick="hint(13)">💡 HINT</button><p class="hints-left">Hints: <span id="hl13">3</span></p><div class="hint-box" id="h13"><p>😰 The boss effect = instant heart rate spike!</p></div></div>
+        </div>
+    </div>
+
+    <!-- R14: CHECKPOINT -->
+    <div class="screen" id="r14">
+        <div class="room">
+            <div class="room-header"><h2 class="room-title">😰 8 PM DREAD</h2><span class="room-badge" style="background:#ff3838">CHECKPOINT</span></div>
+            <div class="scenario">
+                <div class="title">📍 THE DAILY TRAUMA:</div>
+                <p>☀️ 2:00 PM HUDDLE = Energy, hope, good vibes!</p>
+                <p>🌙 8:00 PM CHECKPOINT = Why are we still here? 😭</p>
+                <p>Clock shows 7:58 PM...</p>
+                <p>Everyone: *survival instincts activate* 🏃</p>
+            </div>
+            <div class="box red">
+                <p class="text">Complete the sentence: "The 8 PM Checkpoint is..."</p>
+            </div>
+            <div class="choices" id="choices14">
+                <button class="choice" onclick="select(14,this,'fun')"><span class="letter">A</span> The best part of the day!</button>
+                <button class="choice" onclick="select(14,this,'survival')"><span class="letter">B</span> PURE SURVIVAL MODE! 😰</button>
+                <button class="choice" onclick="select(14,this,'short')"><span class="letter">C</span> Too short, wish it was longer!</button>
+                <button class="choice" onclick="select(14,this,'optional')"><span class="letter">D</span> Totally optional</button>
+            </div>
+            <div class="quote">💬 "2 PM gives life, 8 PM takes it back with interest!" 😂</div>
+            <div class="answer"><button class="btn btn-primary" onclick="check(14)">😰 SUBMIT</button></div>
+            <div class="feedback" id="fb14"></div>
+            <div class="hint-section"><button class="btn btn-hint" onclick="hint(14)">💡 HINT</button><p class="hints-left">Hints: <span id="hl14">3</span></p><div class="hint-box" id="h14"><p>😰 Nobody has EVER said "I love the 8 PM Checkpoint!"</p></div></div>
+        </div>
+    </div>
+
+    <!-- R15: FINAL -->
+    <div class="screen" id="r15">
+        <div class="room">
+            <div class="room-header"><h2 class="room-title">🏆 THE FINAL RIDDLE</h2><span class="room-badge">FINALE</span></div>
+            <div class="box yellow" style="padding:25px">
+                <p class="text" style="font-size:1rem;line-height:2">
+                    🏆 <strong>THE ULTIMATE RIDDLE:</strong><br><br>
+                    <span class="tag sonu">SONU</span> wants RCA when I'm done,<br>
+                    <span class="tag tanveer">TANVEER</span> explains till there's no sun,<br>
+                    <span class="tag harjeet">HARJEET</span> draws the OMS map,<br>
+                    <span class="tag anuj">ANUJ</span> is busy, no time to chat,<br>
+                    <span class="tag neha">NEHA</span> said "I told you so" 📧,<br>
+                    <span class="tag sahil">SAHIL</span> makes hearts beat fast, you know! 💓<br><br>
+                    At 2 PM I'm quick and bright ☀️,<br>
+                    At 8 PM I'm a dreadful sight 🌙...<br><br>
+                    <span style="color:var(--gold);font-size:1.2rem">What am I?</span>
+                </p>
+            </div>
+            <div class="answer">
+                <input type="text" class="answer-input" id="r15-answer" placeholder="Type your answer...">
+                <br><br><button class="btn btn-primary" onclick="check(15)">🏆 CLAIM VICTORY!</button>
+            </div>
+            <div class="feedback" id="fb15"></div>
+            <div class="hint-section"><button class="btn btn-hint" onclick="hint(15)">💡 HINT</button><p class="hints-left">Hints: <span id="hl15">3</span></p><div class="hint-box" id="h15"><p>📅 Huddle and Checkpoint are both types of this... rhymes with "greeting"!</p></div></div>
+        </div>
+    </div>
+
+    <!-- VICTORY -->
+    <div class="screen" id="victory">
+        <div class="victory">
+            <span class="trophy">🏆</span>
+            <h2>ROAST CHAMPIONS!</h2>
+            <p style="font-size:1.1rem;color:var(--blue)">🥇 <span id="winner" style="color:var(--gold)"></span> WINS! 🥇</p>
+            <div class="stats">
+                <div class="stat"><div class="val" id="v-time">00:00</div><div class="lbl">⏱️ TIME</div></div>
+                <div class="stat"><div class="val" id="v-hints">0</div><div class="lbl">💡 HINTS</div></div>
+                <div class="stat"><div class="val" id="v-score">0</div><div class="lbl">🏅 SCORE</div></div>
+            </div>
+            <div class="win-msg">
+                <p>🎊 You survived all the roasts!</p>
+                <p>📋 SONU wants an RCA for your victory!</p>
+                <p>📚 TANVEER is preparing a 3-hour explanation!</p>
+                <p>👻 ANUJ was too busy to congratulate you!</p>
+                <p>😤 TANMAY: "Previous company mein hum jaldi jeette the!"</p>
+                <p>👑 SAHIL: "Good. Now back to work!" 😈</p>
+            </div>
+            <div style="margin-top:18px">
+                <button class="btn btn-primary" onclick="playAgain()" style="margin-right:10px">🔄 AGAIN</button>
+                <button class="btn btn-secondary" onclick="showLB()">🏆 SCORES</button>
+            </div>
+            <div class="leaderboard" id="final-lb" style="display:none;margin-top:20px">
+                <h3>🏆 HALL OF FAME 🏆</h3>
+                <table class="lb-table"><thead><tr><th>Rank</th><th>Team</th><th>Time</th><th>Hints</th><th>Score</th></tr></thead><tbody id="final-lb-body"></tbody></table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const TOTAL=15;
+let G={team:'',room:0,start:null,elapsed:0,hints:0,hintsLeft:3,timer:null,choices:{}};
+const ANS={1:'sprints',2:'rca',3:'history',4:'30min',5:'catching',6:'toldyou',7:'nidhi',8:'notfresher',9:'confused',10:'sahil',11:'curious',12:'together',13:'panic',14:'survival',15:['meeting','meetings','checkpoint','huddle']};
+const MSG={
+    1:'🎬 SRK romances SPRINT BACKLOGS, not heroines! Scrum Master energy!',
+    2:'📋 SONU! RCA for everything - even your headache! Root Cause please!',
+    3:'📚 TANVEER! Quick question = 3 hour history lesson! 😅',
+    4:'🏛️ HARJEET! 30+ mins with full OMS architecture tour! Everyone goes to him!',
+    5:'👻 ANUJ KABRA! Calendar booked till 2087! CRM Master but invisible!',
+    6:'📧 NEHA! "I TOLD YOU SO!" - Check her 2021 email! 🙄',
+    7:'👸 NIDHI YADAV! THE CRM MASTER! Everyone runs to her!',
+    8:'😤 TANMAY! "Yaar mujhe fresher mat samjho!" - Previous company vibes! 💅',
+    9:'🤯 GURLEEN! "Yeh kaunsa app hai yaar?" - 3 apps = brain overload!',
+    10:'🎯 PRATIK works ONLY for SAHIL! Baki sab line mein lago!',
+    11:'🔍 SHASHANK DUTTA! Curious tester - 47 edge cases found! 🧐',
+    12:'🎮 JATIN + RISHABH! SVO package deal - find one, find both! ⚡',
+    13:'📈 SAHIL! Heart rate to the moon when boss asks updates! 😰',
+    14:'😰 8 PM Checkpoint = Survival Mode! Nobody likes it!',
+    15:'🎉 A MEETING! You escaped the ultimate roast!'
+};
+function setTeam(n){document.getElementById('teamName').value=n}
+function loadLB(){const l=JSON.parse(localStorage.getItem('roastV6')||'[]');updateLB(l,'lb-body')}
+function updateLB(l,id){const t=document.getElementById(id);if(!l.length){t.innerHTML='<tr><td colspan="5" style="color:#666;padding:18px">No survivors yet 😱</td></tr>';return}l.sort((a,b)=>b.score-a.score);t.innerHTML=l.slice(0,15).map((e,i)=>`<tr class="${i<3?'rank-'+(i+1):''}"><td>${['🥇','🥈','🥉'][i]||'🏅'} ${i+1}</td><td>${e.name}</td><td>${e.time}</td><td>${e.hints||'-'}</td><td>${e.score}</td></tr>`).join('')}
+function startGame(){const n=document.getElementById('teamName').value.trim();if(!n){document.getElementById('teamName').placeholder='⚠️ Name required!';return}G.team=n;G.start=Date.now();G.room=1;document.getElementById('timer-display').style.display='block';document.getElementById('progress-container').style.display='block';document.getElementById('team-display').textContent=n;buildProgress();startTimer();show('r1');updateProg(1)}
+function buildProgress(){const b=document.getElementById('progress-bar');b.innerHTML='';for(let i=1;i<=TOTAL;i++)b.innerHTML+=`<div class="step" data-s="${i}">${i}</div>`}
+function startTimer(){G.timer=setInterval(tick,1000)}
+function tick(){const e=Math.floor((Date.now()-G.start)/1000);G.elapsed=e;document.getElementById('timer').textContent=`${String(Math.floor(e/60)).padStart(2,'0')}:${String(e%60).padStart(2,'0')}`;if(e>=1500)document.getElementById('timer-display').classList.add('warn');if(e>=1800){clearInterval(G.timer);alert('⏰ Time up! Checkpoint won! 😱');playAgain()}}
+function fmt(s){return`${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`}
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo({top:0,behavior:'smooth'})}
+function updateProg(r){document.querySelectorAll('.step').forEach(s=>{const n=+s.dataset.s;s.classList.remove('active','done');if(n<r)s.classList.add('done');else if(n===r)s.classList.add('active')})}
+function hint(r){if(G.hintsLeft<=0){alert('💡 No hints!');return}const b=document.getElementById('h'+r);if(!b.classList.contains('show')){b.classList.add('show');G.hints++;G.hintsLeft--;for(let i=1;i<=TOTAL;i++){const e=document.getElementById('hl'+i);if(e)e.textContent=G.hintsLeft}}}
+function fb(r,ok,m){const f=document.getElementById('fb'+r);f.className='feedback show '+(ok?'success':'error');f.textContent=m;if(!ok)setTimeout(()=>f.classList.remove('show'),2500)}
+function select(r,btn,v){document.querySelectorAll(`#choices${r} .choice`).forEach(b=>b.classList.remove('selected'));btn.classList.add('selected');G.choices[r]=v}
+function check(r){const ans=ANS[r];let u,ok=false;if(r===15){u=document.getElementById('r15-answer').value.toLowerCase().trim();ok=Array.isArray(ans)?ans.some(a=>u.includes(a)):u===ans}else{u=G.choices[r];if(!u){fb(r,false,'👆 Select an answer!');return}ok=u===ans}if(ok){fb(r,true,MSG[r]);if(r===TOTAL){clearInterval(G.timer);const sc=Math.max(0,2500+(1800-G.elapsed)*2-G.hints*100);save(sc);setTimeout(()=>win(sc),1400)}else{setTimeout(()=>{G.room=r+1;show('r'+(r+1));updateProg(r+1)},1300)}}else{fb(r,false,'❌ Wrong! Try again...')}}
+function save(sc){const l=JSON.parse(localStorage.getItem('roastV6')||'[]');l.push({name:G.team,time:fmt(G.elapsed),hints:G.hints,score:sc,ts:Date.now()});localStorage.setItem('roastV6',JSON.stringify(l))}
+function win(sc){document.getElementById('timer-display').style.display='none';document.getElementById('progress-container').style.display='none';document.getElementById('winner').textContent=G.team;document.getElementById('v-time').textContent=fmt(G.elapsed);document.getElementById('v-hints').textContent=G.hints;document.getElementById('v-score').textContent=sc;show('victory');confetti()}
+function confetti(){const c=['#FFD700','#C0C0C0','#CD7F32','#0085C7','#DF0024','#F4C300','#009F3D','#ff6b6b','#9b59b6','#e91e63'];for(let i=0;i<100;i++){setTimeout(()=>{const d=document.createElement('div');d.className='confetti';d.style.left=Math.random()*100+'vw';d.style.background=c[Math.floor(Math.random()*c.length)];d.style.animationDuration=(Math.random()*2+3)+'s';document.body.appendChild(d);setTimeout(()=>d.remove(),5000)},i*25)}}
+function showLB(){const l=JSON.parse(localStorage.getItem('roastV6')||'[]');updateLB(l,'final-lb-body');document.getElementById('final-lb').style.display='block'}
+function playAgain(){G={team:'',room:0,start:null,elapsed:0,hints:0,hintsLeft:3,timer:null,choices:{}};document.querySelectorAll('input').forEach(i=>i.value='');document.querySelectorAll('.hint-box').forEach(h=>h.classList.remove('show'));for(let i=1;i<=TOTAL;i++){const e=document.getElementById('hl'+i);if(e)e.textContent='3'}document.querySelectorAll('.choice').forEach(b=>b.classList.remove('selected'));document.querySelectorAll('.feedback').forEach(f=>f.classList.remove('show'));document.getElementById('timer-display').style.display='none';document.getElementById('timer-display').classList.remove('warn');document.getElementById('progress-container').style.display='none';document.getElementById('timer').textContent='30:00';document.getElementById('final-lb').style.display='none';show('welcome');loadLB()}
+document.addEventListener('keypress',e=>{if(e.key==='Enter'){const s=document.querySelector('.screen.active');if(s){const b=s.querySelector('.btn-primary');if(b)b.click()}}});
+window.onload=loadLB;
+</script>
+</body>
+</html>
