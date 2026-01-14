@@ -190,6 +190,10 @@
                 <div class="stat-box"><div class="num" id="v-streak">0</div><div class="lbl">Best Streak</div></div>
                 <div class="stat-box"><div class="num" id="v-time">0:00</div><div class="lbl">Time</div></div>
             </div>
+            <div style="margin-top:25px;padding:20px;background:rgba(255,255,255,0.05);border-radius:12px;border:1px solid rgba(255,255,255,0.1);max-width:500px;margin-left:auto;margin-right:auto">
+                <p style="font-size:1.3rem;margin:8px 0">👑 <strong>SAHIL:</strong> "Good. Now get back to work!" 😈</p>
+                <p style="font-size:1.1rem;margin:8px 0">📋 <strong>SONU:</strong> "Where's the RCA for this escape?"</p>
+            </div>
             <div style="margin-top:30px">
                 <button class="btn btn-primary" onclick="playAgain()">Play Again</button>
                 <button class="btn btn-secondary" onclick="showFinalLB()" style="margin-left:10px">Leaderboard</button>
@@ -238,17 +242,17 @@ const ROUNDS = [
     {type:'lateral',question:'What do you call a bear with no teeth?',options:['A scary bear','A gummy bear! 🐻','A sad bear','A toothless bear'],answer:1,explanation:'A gummy bear! 🐻🍬',points:150},
     {type:'lateral',question:'Why don\'t scientists trust atoms?',options:['They\'re small','They make up everything! ⚛️','They\'re unstable','They\'re invisible'],answer:1,explanation:'Because they make up everything! ⚛️😂',points:150},
     {type:'lateral',question:'What did one wall say to the other wall?',options:['Hello','Nothing','I\'ll meet you at the corner! 📐','Goodbye'],answer:2,explanation:'I\'ll meet you at the corner! 📐😄',points:150},
-    {type:'wyr',optionA:'Escape with SONU (must write RCA for every step) 📋',optionB:'Escape with TANVEER (3-hour explanation of the exit route) 📚',points:50},
-    {type:'wyr',optionA:'Call HARJEET for help (30-min OMS architecture lecture first) 🏛️',optionB:'Call ANUJ for help (he\'s too busy, calendar full) 👻',points:50},
-    {type:'wyr',optionA:'Team up with NEHA ("I told you we\'d get stuck!") 📧',optionB:'Team up with GURLEEN ("Wait, which door was it?") 🤯',points:50},
-    {type:'wyr',optionA:'Ask SAHIL for rescue (heart rate: 📈)',optionB:'Ask PRATIK (sorry, Sahil\'s task first!) 🎯',points:50},
-    {type:'wyr',optionA:'Escape with OUR SRK (Sprint planning the escape!) 🎬📊',optionB:'Escape with BOLLYWOOD SRK (romantic hero vibes!) 💃🎥',points:50},
-    {type:'wyr',optionA:'Get escape plan from NIDHI (CRM queen knows all!) 👸',optionB:'Get escape plan from MOHAMMAD SARAHNI (CRM wizard!) ⚡',points:50},
-    {type:'wyr',optionA:'Escape with SAKSHI S. or SAKSHI M.? (Which one?!) 👯',optionB:'Escape with ANNA (pronunciation confusion!) 🙏',points:50},
-    {type:'wyr',optionA:'Get help from TANMAY ("Yaar I\'m not a fresher!") 😤',optionB:'Get help from JATIN + RISHABH (SVO duo package!) 🎮',points:50},
-    {type:'wyr',optionA:'Stuck with SHASHANK (asks 47 curious questions) 🔍',optionB:'Stuck with SAIPUJITHA (finds every escape bug) 🐛',points:50},
-    {type:'wyr',optionA:'Partner with ARSHAAN (OMS expert + Harjeet = 4 hrs) 💥',optionB:'Partner with MOHAMMAD SARAHNI (CRM wizard!) ⚡',points:50},
-    {type:'wyr',optionA:'Escape during 2 PM HUDDLE (hope & energy!) ☀️',optionB:'Escape during 8 PM CHECKPOINT (survival mode!) 🌙',points:50}
+    {type:'wyr',optionA:'Escape with SONU (write RCA for every step!) 📋',optionB:'Escape with TANVEER (3-hour route explanation!) 📚',points:50},
+    {type:'wyr',optionA:'Call HARJEET for help (OMS architecture tour!) 🏛️',optionB:'Call ARSHAAN for help (OMS + Harjeet = 4 hours!) 💥',points:50},
+    {type:'wyr',optionA:'Team up with ANUJ (always busy, never free!) 👻',optionB:'Team up with SRK (sprint planning the escape!) 🎬',points:50},
+    {type:'wyr',optionA:'Ask NIDHI for help (CRM queen knows everything!) 👸',optionB:'Ask MOHAMMAD SARAHNI for help (CRM wizard!) ⚡',points:50},
+    {type:'wyr',optionA:'Partner with NEHA ("I told you we\'d get stuck!") 📧',optionB:'Partner with GURLEEN ("Which door was it?") 🤯',points:50},
+    {type:'wyr',optionA:'Get rescued by Testing Team: PRATIK 🎯',optionB:'Get rescued by Testing Team: SHASHANK (47 questions!) 🔍',points:50},
+    {type:'wyr',optionA:'Testing help from SAIPUJITHA (finds all bugs!) 🐛',optionB:'Testing help from ANNA/SUMANTH (pronunciation first!) 🙏',points:50},
+    {type:'wyr',optionA:'Escape with SAKSHI S. or SAKSHI M.? (Which?!) 👯',optionB:'Escape with SVO Squad: JATIN + RISHABH! 🎮',points:50},
+    {type:'wyr',optionA:'Ask TANMAY ("Yaar I\'m not a fresher!") 😤',optionB:'Ask LOIZOS (international escape expert!) 🌍',points:50},
+    {type:'wyr',optionA:'Final call to SAHIL (heart rate 📈, everyone panics!)',optionB:'Escape during 8 PM CHECKPOINT (pure survival!) 🌙',points:50},
+    {type:'wyr',optionA:'Mission accomplished! SAHIL: "Good, now back to work!" 😈',optionB:'Mission accomplished! SONU: "Where\'s the escape RCA?" 📋',points:50}
 ];
 
 let G = { team:'',round:0,score:0,correct:0,streak:0,bestStreak:0,startTime:null,selected:null,answered:false };
