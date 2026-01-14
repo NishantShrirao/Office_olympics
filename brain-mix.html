@@ -47,7 +47,11 @@
         .game-card{background:var(--card);border:1px solid rgba(255,255,255,0.05);border-radius:20px;padding:35px;margin-bottom:20px;position:relative}
         .game-type{position:absolute;top:20px;left:25px;font-size:0.75rem;text-transform:uppercase;letter-spacing:2px;color:var(--muted)}
         .round-num{position:absolute;top:20px;right:25px;font-family:'Space Grotesk',sans-serif;color:var(--gold);font-size:0.9rem}
-        .question-area{margin:50px 0 30px;text-align:center}
+        .round-timer{text-align:center;font-size:1.3rem;font-weight:700;padding:15px;margin:10px auto;max-width:300px;border-radius:12px;background:rgba(76,175,80,0.1);border:2px solid #4CAF50;transition:all 0.3s}
+        .round-timer.warning{background:rgba(255,152,0,0.1);border-color:#FF9800;color:#FF9800}
+        .round-timer.danger{background:rgba(244,67,54,0.1);border-color:#F44336;color:#F44336;animation:pulse 0.5s infinite}
+        @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+        .question-area{margin:30px 0 30px;text-align:center}
         .question-text{font-size:1.4rem;line-height:1.7;color:var(--text);max-width:600px;margin:0 auto}
         .question-text.large{font-size:1.6rem}
         .stat-display{background:var(--card2);border-radius:16px;padding:30px;margin:25px auto;max-width:400px;text-align:center}
@@ -171,6 +175,7 @@
         <div class="game-card" id="game-card">
             <span class="game-type" id="game-type">LATERAL THINKING</span>
             <span class="round-num" id="round-display">01/15</span>
+            <div class="round-timer" id="round-timer">⏱️ <span id="time-left">20</span>s <span id="time-bonus" style="margin-left:10px;color:#4CAF50"></span></div>
             <div class="question-area" id="question-area"></div>
             <div class="feedback" id="feedback"></div>
             <div class="answer-reveal" id="answer-reveal"></div>
@@ -254,7 +259,7 @@ const ROUNDS = [
     {type:'wyr',optionA:'Final call to SAHIL (heart rate 📈, everyone panics!)',optionB:'Escape during 8 PM CHECKPOINT (pure survival!) 🌙',points:50}
 ];
 
-let G = { team:'',round:0,score:0,correct:0,streak:0,bestStreak:0,startTime:null,selected:null,answered:false };
+let G = { team:'',round:0,score:0,correct:0,streak:0,bestStreak:0,startTime:null,selected:null,answered:false,roundTimer:null,roundTime:0,timeLeft:20 };
 
 function loadLB() {
     if (db) {
@@ -311,11 +316,27 @@ function loadRound() {
     const r = ROUNDS[G.round];
     G.selected = null;
     G.answered = false;
+    G.roundTime = 0;
+    G.timeLeft = 20;
     
     document.getElementById('round-num').textContent = G.round + 1;
     document.getElementById('round-display').textContent = `${String(G.round + 1).padStart(2, '0')}/${ROUNDS.length}`;
     document.getElementById('feedback').className = 'feedback';
     document.getElementById('answer-reveal').className = 'answer-reveal';
+    document.getElementById('time-bonus').textContent = '';
+    
+    // Start round timer
+    if (G.roundTimer) clearInterval(G.roundTimer);
+    updateTimerDisplay();
+    G.roundTimer = setInterval(() => {
+        G.roundTime++;
+        G.timeLeft = Math.max(0, 20 - G.roundTime);
+        updateTimerDisplay();
+        if (G.timeLeft === 0 && !G.answered) {
+            clearInterval(G.roundTimer);
+            autoSubmit();
+        }
+    }, 1000);
     
     const typeLabels = { 'lateral': '😂 FUNNY RIDDLE', 'wyr': '⚖️ WOULD YOU RATHER' };
     document.getElementById('game-type').textContent = typeLabels[r.type];
@@ -397,6 +418,8 @@ function submitLateral() {
     if (G.answered) { nextRound(); return; }
     if (G.selected === null) { showFeedback('error', 'Please select an answer'); return; }
     G.answered = true;
+    if (G.roundTimer) clearInterval(G.roundTimer);
+    
     const r = ROUNDS[G.round];
     const isCorrect = G.selected === r.answer;
     document.querySelectorAll('.option').forEach((o, i) => {
@@ -405,10 +428,12 @@ function submitLateral() {
         else if (i === G.selected) o.classList.add('wrong');
     });
     if (isCorrect) {
-        G.score += r.points; G.correct++; G.streak++; 
+        const timeBonus = Math.floor(G.timeLeft * 5);
+        const totalPoints = r.points + timeBonus;
+        G.score += totalPoints; G.correct++; G.streak++; 
         if (G.streak > G.bestStreak) G.bestStreak = G.streak;
         document.getElementById('score').textContent = G.score;
-        showFeedback('success', `+${r.points} points!`);
+        showFeedback('success', `+${r.points} points ${timeBonus > 0 ? '+ ⚡' + timeBonus + ' speed bonus!' : '!'}`);
     } else { G.streak = 0; showFeedback('error', 'Not quite right'); }
     document.getElementById('answer-reveal').innerHTML = `<div class="label">Answer</div><div class="value">${r.explanation}</div>`;
     document.getElementById('answer-reveal').classList.add('show');
@@ -442,14 +467,56 @@ function submitWYR() {
     if (G.answered) { nextRound(); return; }
     if (G.selected === null) { showFeedback('error', 'Make your choice'); return; }
     G.answered = true;
+    if (G.roundTimer) clearInterval(G.roundTimer);
+    
     const r = ROUNDS[G.round];
-    G.score += r.points; G.correct++;
+    const timeBonus = Math.floor(G.timeLeft * 5);
+    const totalPoints = r.points + timeBonus;
+    G.score += totalPoints; G.correct++;
     document.getElementById('score').textContent = G.score;
-    showFeedback('info', `+${r.points} points! Bold choice 😏`);
+    showFeedback('info', `+${r.points} points ${timeBonus > 0 ? '+ ⚡' + timeBonus + ' speed bonus!' : '!'} Bold choice 😏`);
     document.getElementById('btn-row').innerHTML = `<button class="btn btn-primary" onclick="nextRound()">Next Round →</button>`;
 }
 
-function nextRound() { G.round++; loadRound(); }
+function updateTimerDisplay() {
+    const timerEl = document.getElementById('round-timer');
+    const timeLeftEl = document.getElementById('time-left');
+    timeLeftEl.textContent = G.timeLeft;
+    
+    timerEl.className = 'round-timer';
+    if (G.timeLeft <= 5) timerEl.classList.add('danger');
+    else if (G.timeLeft <= 10) timerEl.classList.add('warning');
+    
+    // Calculate and show potential bonus
+    const bonus = Math.floor(G.timeLeft * 5);
+    document.getElementById('time-bonus').textContent = bonus > 0 ? `+${bonus} speed bonus` : '';
+}
+
+function autoSubmit() {
+    if (G.answered) return;
+    showFeedback('error', '⏰ Time\'s up! No points this round');
+    const r = ROUNDS[G.round];
+    G.answered = true;
+    G.streak = 0;
+    
+    if (r.type === 'lateral') {
+        document.querySelectorAll('.option').forEach((o, i) => {
+            o.style.pointerEvents = 'none';
+            if (i === r.answer) o.classList.add('correct');
+        });
+        document.getElementById('answer-reveal').innerHTML = `<div class="label">Answer</div><div class="value">${r.explanation}</div>`;
+    }
+    
+    document.getElementById('answer-reveal').classList.add('show');
+    document.getElementById('btn-row').innerHTML = `<button class="btn btn-primary" onclick="nextRound()">Next Round →</button>`;
+}
+
+function nextRound() { 
+    if (G.roundTimer) clearInterval(G.roundTimer);
+    G.round++; 
+    loadRound(); 
+}
+
 function showFeedback(type, msg) {
     const fb = document.getElementById('feedback');
     fb.className = `feedback show ${type}`;
@@ -520,6 +587,8 @@ function showFinalLB() {
 }
 
 function playAgain() {
+    if (G.roundTimer) clearInterval(G.roundTimer);
+    G = { team:'',round:0,score:0,correct:0,streak:0,bestStreak:0,startTime:null,selected:null,answered:false,roundTimer:null,roundTime:0,timeLeft:20 };
     document.getElementById('teamName').value = '';
     document.getElementById('teamName').style.borderColor = '';
     document.getElementById('final-lb').style.display = 'none';
