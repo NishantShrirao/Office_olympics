@@ -14,6 +14,9 @@
         .header{text-align:center;padding:30px 0}
         .header h1{font-family:'Space Grotesk',sans-serif;font-size:2.2rem;background:var(--gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:-1px;margin-bottom:5px}
         .header p{color:var(--muted);font-size:0.95rem}
+        .live-badge{background:rgba(239,68,68,0.2);border:1px solid var(--error);color:var(--error);padding:6px 14px;border-radius:20px;font-size:0.75rem;display:inline-flex;align-items:center;gap:6px;margin-bottom:15px}
+        .live-dot{width:8px;height:8px;background:var(--error);border-radius:50%;animation:pulse 2s infinite}
+        @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
         .score-bar{background:var(--card);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:16px 24px;margin-bottom:25px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:15px}
         .team-info{display:flex;align-items:center;gap:12px}
         .team-name{font-family:'Space Grotesk',sans-serif;color:var(--gold);font-size:1.1rem;font-weight:600}
@@ -118,6 +121,7 @@
     <header class="header">
         <h1>MIND GAMES</h1>
         <p>Think Fast. Think Smart. Win Big.</p>
+        <div class="live-badge"><span class="live-dot"></span>LIVE LEADERBOARD</div>
     </header>
     
     <div class="score-bar" id="score-bar" style="display:none">
@@ -156,8 +160,8 @@
             </div>
             <button class="btn btn-primary" onclick="startGame()">Start Challenge</button>
             <div class="leaderboard" id="welcome-lb">
-                <h3>🏆 LEADERBOARD</h3>
-                <table class="lb-table"><thead><tr><th>Rank</th><th>Team</th><th>Score</th></tr></thead><tbody id="lb-body"><tr><td colspan="3" style="color:var(--muted);padding:25px">No teams yet</td></tr></tbody></table>
+                <h3>🏆 LIVE LEADERBOARD</h3>
+                <table class="lb-table"><thead><tr><th>Rank</th><th>Team</th><th>Score</th></tr></thead><tbody id="lb-body"><tr><td colspan="3" style="color:var(--muted);padding:25px">Loading...</td></tr></tbody></table>
             </div>
         </div>
     </div>
@@ -191,147 +195,69 @@
                 <button class="btn btn-secondary" onclick="showFinalLB()" style="margin-left:10px">Leaderboard</button>
             </div>
             <div class="leaderboard" id="final-lb" style="display:none;margin-top:30px">
-                <h3>🏆 TOP SCORES</h3>
+                <h3>🏆 LIVE LEADERBOARD</h3>
                 <table class="lb-table"><thead><tr><th>Rank</th><th>Team</th><th>Score</th></tr></thead><tbody id="final-lb-body"></tbody></table>
             </div>
         </div>
     </div>
 </div>
 
-<script>
-const ROUNDS = [
-    // LATERAL THINKING (1-5)
-    {
-        type: 'lateral',
-        question: 'A man pushes his car to a hotel and loses all his money. What happened?',
-        options: ['He crashed the car', 'He was playing Monopoly', 'The hotel was a casino', 'He sold the car'],
-        answer: 1,
-        explanation: 'He was playing Monopoly! 🎲',
-        points: 100
-    },
-    {
-        type: 'lateral',
-        question: 'What can travel around the world while staying in a corner?',
-        options: ['A satellite', 'A postage stamp', 'The internet', 'A compass'],
-        answer: 1,
-        explanation: 'A postage stamp stays in the corner of an envelope! 📮',
-        points: 100
-    },
-    {
-        type: 'lateral',
-        question: 'I have cities, but no houses. I have mountains, but no trees. I have water, but no fish. What am I?',
-        options: ['A painting', 'A map', 'A dream', 'A photograph'],
-        answer: 1,
-        explanation: 'A map has all these without the real things! 🗺️',
-        points: 100
-    },
-    {
-        type: 'lateral',
-        question: 'A woman shoots her husband, then holds him underwater for 5 minutes. Next, she hangs him. Right after, they enjoy a lovely dinner. How?',
-        options: ['It was a dream', 'She photographed him', 'He\'s a ghost', 'It\'s a movie scene'],
-        answer: 1,
-        explanation: 'She shot a photo, developed it in water, and hung it to dry! 📸',
-        points: 100
-    },
-    {
-        type: 'lateral',
-        question: 'What gets wetter the more it dries?',
-        options: ['A sponge', 'A towel', 'Ice', 'Your hands'],
-        answer: 1,
-        explanation: 'A towel gets wetter as it dries you off! 🛁',
-        points: 100
-    },
-    
-    // HIGHER OR LOWER (6-10)
-    {
-        type: 'higher-lower',
-        item1: { name: 'Average emails sent per day globally', value: 333 },
-        item2: { name: 'Flights in the air right now', value: 9700 },
-        unit1: 'billion',
-        unit2: 'flights',
-        points: 150
-    },
-    {
-        type: 'higher-lower',
-        item1: { name: 'Google searches per second', value: 99000 },
-        item2: { name: 'Tweets posted per second', value: 6000 },
-        unit1: 'searches',
-        unit2: 'tweets',
-        points: 150
-    },
-    {
-        type: 'higher-lower',
-        item1: { name: 'Years to pay off US national debt ($1/sec)', value: 1000000 },
-        item2: { name: 'Age of the universe in years', value: 13800000000 },
-        unit1: 'years',
-        unit2: 'years',
-        points: 150
-    },
-    {
-        type: 'higher-lower',
-        item1: { name: 'Netflix subscribers worldwide', value: 238 },
-        item2: { name: 'Spotify premium subscribers', value: 220 },
-        unit1: 'million',
-        unit2: 'million',
-        points: 150
-    },
-    {
-        type: 'higher-lower',
-        item1: { name: 'Hours of video uploaded to YouTube per minute', value: 500 },
-        item2: { name: 'Wikipedia articles', value: 6700000 },
-        unit1: 'hours',
-        unit2: 'articles',
-        points: 150
-    },
-    
-    // WOULD YOU RATHER (11-15)
-    {
-        type: 'wyr',
-        optionA: 'Accidentally reply-all with an embarrassing personal message to 500 colleagues',
-        optionB: 'Have your complete browser history displayed on the office big screen for 1 hour',
-        points: 50
-    },
-    {
-        type: 'wyr',
-        optionA: 'Have your boss hear every thought you think during meetings',
-        optionB: 'Say everything you think out loud for one full workday',
-        points: 50
-    },
-    {
-        type: 'wyr',
-        optionA: 'Never be able to use copy-paste again',
-        optionB: 'Have your typing speed permanently limited to 10 words per minute',
-        points: 50
-    },
-    {
-        type: 'wyr',
-        optionA: 'Attend an 8-hour meeting every Monday with no breaks',
-        optionB: 'Work every weekend but have Wednesdays completely off',
-        points: 50
-    },
-    {
-        type: 'wyr',
-        optionA: 'Have unlimited PTO but earn 50% less salary',
-        optionB: 'Earn double salary but never take a vacation again',
-        points: 50
-    }
-];
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
-let G = {
-    team: '',
-    round: 0,
-    score: 0,
-    correct: 0,
-    streak: 0,
-    bestStreak: 0,
-    startTime: null,
-    selected: null,
-    answered: false
+<script>
+// 🔥 FIREBASE CONFIG - REPLACE THIS WITH YOUR CONFIG
+const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT_ID.appspot.com",
+    messagingSenderId: "YOUR_MESSAGING_ID",
+    appId: "YOUR_APP_ID"
 };
 
+// Initialize Firebase
+let db = null;
+try {
+    firebase.initializeApp(firebaseConfig);
+    db = firebase.firestore();
+    console.log('✅ Firebase connected');
+} catch(e) {
+    console.warn('⚠️ Firebase not configured, using local storage');
+}
+
+const ROUNDS = [
+    {type:'lateral',question:'A man pushes his car to a hotel and loses all his money. What happened?',options:['He crashed the car','He was playing Monopoly','The hotel was a casino','He sold the car'],answer:1,explanation:'He was playing Monopoly! 🎲',points:100},
+    {type:'lateral',question:'What can travel around the world while staying in a corner?',options:['A satellite','A postage stamp','The internet','A compass'],answer:1,explanation:'A postage stamp stays in the corner of an envelope! 📮',points:100},
+    {type:'lateral',question:'I have cities, but no houses. I have mountains, but no trees. I have water, but no fish. What am I?',options:['A painting','A map','A dream','A photograph'],answer:1,explanation:'A map has all these without the real things! 🗺️',points:100},
+    {type:'lateral',question:'A woman shoots her husband, then holds him underwater for 5 minutes. Next, she hangs him. Right after, they enjoy a lovely dinner. How?',options:['It was a dream','She photographed him','He\'s a ghost','It\'s a movie scene'],answer:1,explanation:'She shot a photo, developed it in water, and hung it to dry! 📸',points:100},
+    {type:'lateral',question:'What gets wetter the more it dries?',options:['A sponge','A towel','Ice','Your hands'],answer:1,explanation:'A towel gets wetter as it dries you off! 🛁',points:100},
+    {type:'higher-lower',item1:{name:'Average emails sent per day globally',value:333},item2:{name:'Flights in the air right now',value:9700},unit1:'billion',unit2:'flights',points:150},
+    {type:'higher-lower',item1:{name:'Google searches per second',value:99000},item2:{name:'Tweets posted per second',value:6000},unit1:'searches',unit2:'tweets',points:150},
+    {type:'higher-lower',item1:{name:'Years to pay off US national debt ($1/sec)',value:1000000},item2:{name:'Age of the universe in years',value:13800000000},unit1:'years',unit2:'years',points:150},
+    {type:'higher-lower',item1:{name:'Netflix subscribers worldwide',value:238},item2:{name:'Spotify premium subscribers',value:220},unit1:'million',unit2:'million',points:150},
+    {type:'higher-lower',item1:{name:'Hours of video uploaded to YouTube per minute',value:500},item2:{name:'Wikipedia articles',value:6700000},unit1:'hours',unit2:'articles',points:150},
+    {type:'wyr',optionA:'Accidentally reply-all with an embarrassing personal message to 500 colleagues',optionB:'Have your complete browser history displayed on the office big screen for 1 hour',points:50},
+    {type:'wyr',optionA:'Have your boss hear every thought you think during meetings',optionB:'Say everything you think out loud for one full workday',points:50},
+    {type:'wyr',optionA:'Never be able to use copy-paste again',optionB:'Have your typing speed permanently limited to 10 words per minute',points:50},
+    {type:'wyr',optionA:'Attend an 8-hour meeting every Monday with no breaks',optionB:'Work every weekend but have Wednesdays completely off',points:50},
+    {type:'wyr',optionA:'Have unlimited PTO but earn 50% less salary',optionB:'Earn double salary but never take a vacation again',points:50}
+];
+
+let G = { team:'',round:0,score:0,correct:0,streak:0,bestStreak:0,startTime:null,selected:null,answered:false };
+
 function loadLB() {
-    const l = JSON.parse(localStorage.getItem('mindGamesV1') || '[]');
-    updateLB(l, 'lb-body');
+    if (db) {
+        db.collection('leaderboard').orderBy('score', 'desc').limit(10).onSnapshot((snapshot) => {
+            const scores = [];
+            snapshot.forEach((doc) => scores.push(doc.data()));
+            updateLB(scores, 'lb-body');
+        });
+    } else {
+        const l = JSON.parse(localStorage.getItem('mindGamesV1') || '[]');
+        updateLB(l, 'lb-body');
+    }
 }
 
 function updateLB(l, id) {
@@ -341,7 +267,7 @@ function updateLB(l, id) {
         return;
     }
     l.sort((a, b) => b.score - a.score);
-    t.innerHTML = l.slice(0, 8).map((e, i) => `
+    t.innerHTML = l.slice(0,10).map((e, i) => `
         <tr class="${i < 3 ? 'rank-' + (i + 1) : ''}">
             <td>${['🥇', '🥈', '🥉'][i] || (i + 1)}</td>
             <td>${e.name}</td>
@@ -460,33 +386,21 @@ function selectWYR(opt) {
 
 function submitLateral() {
     if (G.answered) { nextRound(); return; }
-    if (G.selected === null) {
-        showFeedback('error', 'Please select an answer');
-        return;
-    }
-    
+    if (G.selected === null) { showFeedback('error', 'Please select an answer'); return; }
     G.answered = true;
     const r = ROUNDS[G.round];
     const isCorrect = G.selected === r.answer;
-    
     document.querySelectorAll('.option').forEach((o, i) => {
         o.style.pointerEvents = 'none';
         if (i === r.answer) o.classList.add('correct');
         else if (i === G.selected) o.classList.add('wrong');
     });
-    
     if (isCorrect) {
-        G.score += r.points;
-        G.correct++;
-        G.streak++;
+        G.score += r.points; G.correct++; G.streak++; 
         if (G.streak > G.bestStreak) G.bestStreak = G.streak;
         document.getElementById('score').textContent = G.score;
         showFeedback('success', `+${r.points} points!`);
-    } else {
-        G.streak = 0;
-        showFeedback('error', 'Not quite right');
-    }
-    
+    } else { G.streak = 0; showFeedback('error', 'Not quite right'); }
     document.getElementById('answer-reveal').innerHTML = `<div class="label">Answer</div><div class="value">${r.explanation}</div>`;
     document.getElementById('answer-reveal').classList.add('show');
     document.getElementById('btn-row').innerHTML = `<button class="btn btn-primary" onclick="nextRound()">Next Round →</button>`;
@@ -494,34 +408,22 @@ function submitLateral() {
 
 function submitHL() {
     if (G.answered) { nextRound(); return; }
-    if (G.selected === null) {
-        showFeedback('error', 'Make your choice');
-        return;
-    }
-    
+    if (G.selected === null) { showFeedback('error', 'Make your choice'); return; }
     G.answered = true;
     const r = ROUNDS[G.round];
     const correctAnswer = r.item1.value > r.item2.value ? 'higher' : 'lower';
     const isCorrect = G.selected === correctAnswer;
-    
     document.querySelectorAll('.hl-btn').forEach(b => {
         b.style.pointerEvents = 'none';
         if (b.classList.contains(correctAnswer)) b.classList.add('correct');
         else if (b.classList.contains(G.selected)) b.classList.add('wrong');
     });
-    
     if (isCorrect) {
-        G.score += r.points;
-        G.correct++;
-        G.streak++;
+        G.score += r.points; G.correct++; G.streak++;
         if (G.streak > G.bestStreak) G.bestStreak = G.streak;
         document.getElementById('score').textContent = G.score;
         showFeedback('success', `+${r.points} points!`);
-    } else {
-        G.streak = 0;
-        showFeedback('error', 'Wrong guess!');
-    }
-    
+    } else { G.streak = 0; showFeedback('error', 'Wrong guess!'); }
     document.getElementById('answer-reveal').innerHTML = `<div class="label">${r.item2.name}</div><div class="value">${r.item2.value.toLocaleString()} ${r.unit2}</div>`;
     document.getElementById('answer-reveal').classList.add('show');
     document.getElementById('btn-row').innerHTML = `<button class="btn btn-primary" onclick="nextRound()">Next Round →</button>`;
@@ -529,28 +431,16 @@ function submitHL() {
 
 function submitWYR() {
     if (G.answered) { nextRound(); return; }
-    if (G.selected === null) {
-        showFeedback('error', 'Make your choice');
-        return;
-    }
-    
+    if (G.selected === null) { showFeedback('error', 'Make your choice'); return; }
     G.answered = true;
     const r = ROUNDS[G.round];
-    
-    // WYR has no wrong answer - everyone gets points
-    G.score += r.points;
-    G.correct++;
+    G.score += r.points; G.correct++;
     document.getElementById('score').textContent = G.score;
-    
     showFeedback('info', `+${r.points} points! Bold choice 😏`);
     document.getElementById('btn-row').innerHTML = `<button class="btn btn-primary" onclick="nextRound()">Next Round →</button>`;
 }
 
-function nextRound() {
-    G.round++;
-    loadRound();
-}
-
+function nextRound() { G.round++; loadRound(); }
 function showFeedback(type, msg) {
     const fb = document.getElementById('feedback');
     fb.className = `feedback show ${type}`;
@@ -561,10 +451,19 @@ function endGame() {
     const elapsed = Math.floor((Date.now() - G.startTime) / 1000);
     const timeStr = `${Math.floor(elapsed / 60)}:${String(elapsed % 60).padStart(2, '0')}`;
     
-    // Save
-    const scores = JSON.parse(localStorage.getItem('mindGamesV1') || '[]');
-    scores.push({ name: G.team, score: G.score, time: timeStr, ts: Date.now() });
-    localStorage.setItem('mindGamesV1', JSON.stringify(scores));
+    // Save to Firebase or localStorage
+    if (db) {
+        db.collection('leaderboard').add({
+            name: G.team,
+            score: G.score,
+            time: timeStr,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        }).then(() => console.log('Score saved to Firebase'));
+    } else {
+        const scores = JSON.parse(localStorage.getItem('mindGamesV1') || '[]');
+        scores.push({ name: G.team, score: G.score, time: timeStr, ts: Date.now() });
+        localStorage.setItem('mindGamesV1', JSON.stringify(scores));
+    }
     
     document.getElementById('score-bar').style.display = 'none';
     document.getElementById('winner').textContent = G.team;
@@ -598,8 +497,16 @@ function confetti() {
 }
 
 function showFinalLB() {
-    const l = JSON.parse(localStorage.getItem('mindGamesV1') || '[]');
-    updateLB(l, 'final-lb-body');
+    if (db) {
+        db.collection('leaderboard').orderBy('score', 'desc').limit(10).get().then((snapshot) => {
+            const scores = [];
+            snapshot.forEach((doc) => scores.push(doc.data()));
+            updateLB(scores, 'final-lb-body');
+        });
+    } else {
+        const l = JSON.parse(localStorage.getItem('mindGamesV1') || '[]');
+        updateLB(l, 'final-lb-body');
+    }
     document.getElementById('final-lb').style.display = 'block';
 }
 
@@ -615,4 +522,3 @@ window.onload = loadLB;
 </script>
 </body>
 </html>
-
