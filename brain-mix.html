@@ -129,14 +129,14 @@
             <span class="team-name" id="team-display">Team</span>
         </div>
         <div class="score-display">Score: <span id="score">0</span></div>
-        <div class="round-pill">Round <span id="round-num">1</span>/15</div>
+        <div class="round-pill">Round <span id="round-num">1</span>/20</div>
     </div>
 
     <!-- WELCOME -->
     <div class="screen active" id="welcome">
         <div class="welcome">
             <span class="logo">🧠</span>
-            <h2 class="tagline">2 Games. <span>15 Rounds.</span> Pure FUN!</h2>
+            <h2 class="tagline">2 Games. <span>20 Rounds.</span> ROAST Your Team!</h2>
             <div class="game-modes">
                 <div class="mode">
                     <span class="mode-icon">😂</span>
@@ -145,8 +145,8 @@
                 </div>
                 <div class="mode">
                     <span class="mode-icon">⚖️</span>
-                    <h4>WOULD YOU RATHER</h4>
-                    <p>Crazy choices. Hilarious debates!</p>
+                    <h4>TEAM ROAST</h4>
+                    <p>Escape with your teammates! Hilarious scenarios!</p>
                 </div>
                 <div class="mode">
                     <span class="mode-icon">🎉</span>
@@ -238,11 +238,16 @@ const ROUNDS = [
     {type:'lateral',question:'What do you call a bear with no teeth?',options:['A scary bear','A gummy bear! 🐻','A sad bear','A toothless bear'],answer:1,explanation:'A gummy bear! 🐻🍬',points:150},
     {type:'lateral',question:'Why don\'t scientists trust atoms?',options:['They\'re small','They make up everything! ⚛️','They\'re unstable','They\'re invisible'],answer:1,explanation:'Because they make up everything! ⚛️😂',points:150},
     {type:'lateral',question:'What did one wall say to the other wall?',options:['Hello','Nothing','I\'ll meet you at the corner! 📐','Goodbye'],answer:2,explanation:'I\'ll meet you at the corner! 📐😄',points:150},
-    {type:'wyr',optionA:'Have the ability to fly but only 1 meter high 🦅',optionB:'Be invisible but only when nobody is looking 👻',points:50},
-    {type:'wyr',optionA:'Have to sing everything you say for a day 🎤',optionB:'Have to dance everywhere you go for a day 💃',points:50},
-    {type:'wyr',optionA:'Eat pizza for every meal for a year 🍕',optionB:'Never eat pizza again 😱',points:50},
-    {type:'wyr',optionA:'Have a rewind button for your life ⏪',optionB:'Have a pause button for your life ⏸️',points:50},
-    {type:'wyr',optionA:'Be able to talk to animals 🐶',optionB:'Be able to speak all human languages 🌍',points:50}
+    {type:'wyr',optionA:'Escape with SONU (must write RCA for every step) 📋',optionB:'Escape with TANVEER (3-hour explanation of the exit route) 📚',points:50},
+    {type:'wyr',optionA:'Call HARJEET for help (30-min OMS architecture lecture first) 🏛️',optionB:'Call ANUJ for help (he\'s too busy, calendar full) 👻',points:50},
+    {type:'wyr',optionA:'Team up with NEHA ("I told you we\'d get stuck!") 📧',optionB:'Team up with GURLEEN ("Wait, which door was it?") 🤯',points:50},
+    {type:'wyr',optionA:'Ask SAHIL for rescue (heart rate: 📈)',optionB:'Ask PRATIK (sorry, Sahil\'s task first!) 🎯',points:50},
+    {type:'wyr',optionA:'Partner with SRK (sprint planning the escape) 🎬',optionB:'Partner with NIDHI (CRM queen knows everything!) 👸',points:50},
+    {type:'wyr',optionA:'Escape with SAKSHI S. or SAKSHI M.? (Which one?!) 👯',optionB:'Escape with ANNA (pronunciation confusion!) 🙏',points:50},
+    {type:'wyr',optionA:'Get help from TANMAY ("Yaar I\'m not a fresher!") 😤',optionB:'Get help from JATIN + RISHABH (SVO duo package!) 🎮',points:50},
+    {type:'wyr',optionA:'Stuck with SHASHANK (asks 47 curious questions) 🔍',optionB:'Stuck with SAIPUJITHA (finds every escape bug) 🐛',points:50},
+    {type:'wyr',optionA:'Partner with ARSHAAN (OMS expert + Harjeet = 4 hrs) 💥',optionB:'Partner with MOHAMMAD SARAHNI (CRM wizard!) ⚡',points:50},
+    {type:'wyr',optionA:'Escape during 2 PM HUDDLE (hope & energy!) ☀️',optionB:'Escape during 8 PM CHECKPOINT (survival mode!) 🌙',points:50}
 ];
 
 let G = { team:'',round:0,score:0,correct:0,streak:0,bestStreak:0,startTime:null,selected:null,answered:false };
